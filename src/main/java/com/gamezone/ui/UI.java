@@ -78,6 +78,9 @@ public class UI {
                 case "8":
                     listAllSales();
                     break;
+                case "9":
+                    listCustomerSales();
+                    break;
             }
         }
     }
@@ -362,6 +365,49 @@ public class UI {
         } catch (Exception e) {
             System.out.println(
                     "Error al listar el historial de ventas: " + e.getMessage()
+            );
+        }
+    }
+    /**
+     * Displays the sales history of a specific customer.
+     */
+    private void listCustomerSales() {
+        System.out.println("\n===== HISTORIAL DE COMPRAS DEL CLIENTE =====");
+
+        System.out.print("ID del cliente: ");
+        String customerId = scanner.nextLine();
+
+        try {
+            List<Sale> customerSales = saleService.listCustomerSales(customerId);
+
+            if (customerSales.isEmpty()) {
+                System.out.println("El cliente no tiene compras registradas.");
+                return;
+            }
+
+            for (Sale sale : customerSales) {
+                System.out.println(
+                        "Fecha: " + sale.getDate()
+                                + " | Cliente: " + sale.getCustomer().getName()
+                                + " | Vendedor: " + sale.getSeller().getName()
+                                + " | Total: $" + sale.calculateTotal()
+                );
+
+                System.out.println("Productos:");
+
+                for (Product product : sale.getProducts()) {
+                    System.out.println(
+                            "  - " + product.getTitle()
+                                    + " | Precio: $" + product.getPrice()
+                    );
+                }
+
+                System.out.println();
+            }
+        } catch (Exception e) {
+            System.out.println(
+                    "Error al consultar el historial del cliente: "
+                            + e.getMessage()
             );
         }
     }
