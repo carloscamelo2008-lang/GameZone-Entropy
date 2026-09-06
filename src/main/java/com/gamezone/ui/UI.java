@@ -84,6 +84,9 @@ public class UI {
                 case "10":
                     listSellerSales();
                     break;
+                default:
+                    System.out.println("Opción no válida. Intente nuevamente.");
+                    break;
             }
         }
     }
