@@ -81,6 +81,9 @@ public class UI {
                 case "9":
                     listCustomerSales();
                     break;
+                case "10":
+                    listSellerSales();
+                    break;
             }
         }
     }
@@ -407,6 +410,49 @@ public class UI {
         } catch (Exception e) {
             System.out.println(
                     "Error al consultar el historial del cliente: "
+                            + e.getMessage()
+            );
+        }
+    }
+    /**
+     * Displays the sales history of a specific seller.
+     */
+    private void listSellerSales() {
+        System.out.println("\n===== HISTORIAL DE VENTAS DEL VENDEDOR =====");
+
+        System.out.print("ID del vendedor: ");
+        String sellerId = scanner.nextLine();
+
+        try {
+            List<Sale> sellerSales = saleService.listSellerSales(sellerId);
+
+            if (sellerSales.isEmpty()) {
+                System.out.println("El vendedor no tiene ventas registradas.");
+                return;
+            }
+
+            for (Sale sale : sellerSales) {
+                System.out.println(
+                        "Fecha: " + sale.getDate()
+                                + " | Cliente: " + sale.getCustomer().getName()
+                                + " | Vendedor: " + sale.getSeller().getName()
+                                + " | Total: $" + sale.calculateTotal()
+                );
+
+                System.out.println("Productos:");
+
+                for (Product product : sale.getProducts()) {
+                    System.out.println(
+                            "  - " + product.getTitle()
+                                    + " | Precio: $" + product.getPrice()
+                    );
+                }
+
+                System.out.println();
+            }
+        } catch (Exception e) {
+            System.out.println(
+                    "Error al consultar el historial del vendedor: "
                             + e.getMessage()
             );
         }
