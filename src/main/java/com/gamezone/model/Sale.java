@@ -1,5 +1,6 @@
 package com.gamezone.model;
 
+import java.io.Serializable;
 import java.time.LocalDateTime;
 import java.util.List;
 
@@ -8,8 +9,8 @@ import java.util.List;
  * A sale is associated with a customer, a seller, a date,
  * and one or more products.
  */
-public class Sale {
-
+public class Sale implements Serializable {
+    private static final long serialVersionUID = 1L;
     private LocalDateTime date;
     private Customer customer;
     private Seller seller;
