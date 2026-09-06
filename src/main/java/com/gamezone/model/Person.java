@@ -1,11 +1,12 @@
 package com.gamezone.model;
+import java.io.Serializable;
 
 /**
  * Abstract base class representing a person that interacts with the store.
  * A generic Person cannot exist on its own in this domain: every person
  * must be either a Customer or a Seller, so this class is declared abstract.
  */
-public abstract class Person {
+public abstract class Person implements Serializable {
 
     private String id;
     private String name;
