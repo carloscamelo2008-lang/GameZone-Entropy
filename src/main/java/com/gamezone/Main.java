@@ -6,7 +6,7 @@ import com.gamezone.persistence.SaleRepository;
 import com.gamezone.service.PersonService;
 import com.gamezone.service.ProductService;
 import com.gamezone.service.SaleService;
-
+import com.gamezone.ui.UI;
 /**
  * Application entry point for the GameZone system.
  */
@@ -48,6 +48,7 @@ public class Main {
                         personService
                 );
 
-        System.out.println("GameZone started successfully.");
+        UI ui = new UI(personService, productService, saleService);
+        ui.start();
     }
 }
