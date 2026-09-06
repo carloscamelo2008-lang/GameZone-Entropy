@@ -50,7 +50,12 @@ public class UI {
                     running = false;
                     System.out.println("Goodbye!");
                     break;
-
+                case "4":
+                    registerCustomer();
+                    break;
+                case "5":
+                    listCustomers();
+                    break;
                 case "6":
                     listSellers();
                     break;
@@ -64,32 +69,73 @@ public class UI {
     private void showMenu() {
         System.out.println();
         System.out.println("===== GAMEZONE =====");
-        System.out.println("1. Register video game");
-        System.out.println("2. Register console");
-        System.out.println("3. List products");
-        System.out.println("4. Register customer");
-        System.out.println("5. List customers");
-        System.out.println("6. List sellers");
-        System.out.println("7. Register sale");
-        System.out.println("8. List all sales");
-        System.out.println("9. List customer sales");
-        System.out.println("10. List seller sales");
-        System.out.println("0. Exit");
-        System.out.print("Select an option: ");
+        System.out.println("1. Registrar videojuego");
+        System.out.println("2. Registrar consola");
+        System.out.println("3. Listar productos");
+        System.out.println("4. Registrar cliente");
+        System.out.println("5. Listar clientes");
+        System.out.println("6. Listar vendedores");
+        System.out.println("7. Registrar venta");
+        System.out.println("8. Listar historial de ventas");
+        System.out.println("9. Historial de compras de cliente");
+        System.out.println("10. Historial de ventas de vendedor");
+        System.out.println("0. Salir");
+        System.out.print("Seleccione una opción: ");
     }
+
     /**
      * Displays all registered sellers.
      */
     private void listSellers() {
-        System.out.println("\n===== SELLERS =====");
+        System.out.println("\n===== VENDEDORES =====");
 
         for (var seller : personService.listSellers()) {
             System.out.println(
                     "ID: " + seller.getId()
-                            + " | Name: " + seller.getName()
-                            + " | Phone: " + seller.getPhone()
-                            + " | Employee Code: " + seller.getEmployeeCode()
-                            + " | Shift: " + seller.getShift()
+                            + " | Nombre: " + seller.getName()
+                            + " | Teléfono: " + seller.getPhone()
+                            + " | Código de empleado: " + seller.getEmployeeCode()
+                            + " | Turno: " + seller.getShift()
+            );
+        }
+    }
+    /**
+     * Registers a new customer using data entered through the console.
+     */
+    private void registerCustomer() {
+        System.out.println("\n===== REGISTRAR CLIENTE =====");
+
+        System.out.print("Identificación: ");
+        String id = scanner.nextLine();
+
+        System.out.print("Nombre: ");
+        String name = scanner.nextLine();
+
+        System.out.print("Teléfono: ");
+        String phone = scanner.nextLine();
+
+        System.out.print("Correo electrónico: ");
+        String email = scanner.nextLine();
+
+        try {
+            personService.registerCustomer(id, name, phone, email);
+            System.out.println("Cliente registrado correctamente.");
+        } catch (Exception e) {
+            System.out.println("Error al registrar el cliente: " + e.getMessage());
+        }
+    }
+    /**
+     * Displays all registered customers.
+     */
+    private void listCustomers() {
+        System.out.println("\n===== CLIENTES =====");
+
+        for (var customer : personService.listCustomers()) {
+            System.out.println(
+                    "ID: " + customer.getId()
+                            + " | Nombre: " + customer.getName()
+                            + " | Teléfono: " + customer.getPhone()
+                            + " | Correo: " + customer.getEmail()
             );
         }
     }
