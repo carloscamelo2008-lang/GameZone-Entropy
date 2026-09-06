@@ -3,7 +3,8 @@ package com.gamezone.ui;
 import com.gamezone.service.PersonService;
 import com.gamezone.service.ProductService;
 import com.gamezone.service.SaleService;
-
+import com.gamezone.model.Product;
+import java.util.List;
 import java.util.Scanner;
 
 /**
@@ -50,6 +51,17 @@ public class UI {
                     running = false;
                     System.out.println("Goodbye!");
                     break;
+                case "1":
+                    registerVideoGame();
+                    break;
+
+                case "2":
+                    registerConsole();
+                    break;
+
+                case "3":
+                    listProducts();
+                    break;
                 case "4":
                     registerCustomer();
                     break;
@@ -82,6 +94,119 @@ public class UI {
         System.out.println("0. Salir");
         System.out.print("Seleccione una opción: ");
     }
+    /**
+     * Displays a form to register a new video game.
+     */
+    private void registerVideoGame() {
+        System.out.println("\n===== REGISTRAR VIDEOJUEGO =====");
+
+        System.out.print("ID: ");
+        String id = scanner.nextLine();
+
+        System.out.print("Nombre: ");
+        String title = scanner.nextLine();
+
+        System.out.print("Precio: ");
+        double price = Double.parseDouble(scanner.nextLine());
+
+        System.out.print("Stock: ");
+        int stock = Integer.parseInt(scanner.nextLine());
+
+        System.out.print("Plataforma: ");
+        String platform = scanner.nextLine();
+
+        System.out.print("Género: ");
+        String genre = scanner.nextLine();
+
+        System.out.print("Clasificación por edad: ");
+        String ageRating = scanner.nextLine();
+
+        try {
+            productService.registerVideoGame(
+                    id,
+                    title,
+                    price,
+                    stock,
+                    platform,
+                    genre,
+                    ageRating
+            );
+
+            System.out.println("Videojuego registrado correctamente.");
+        } catch (Exception e) {
+            System.out.println("Error al registrar el videojuego: " + e.getMessage());
+        }
+    }
+    /**
+     * Displays a form to register a new console.
+     */
+    private void registerConsole() {
+        System.out.println("\n===== REGISTRAR CONSOLA =====");
+
+        System.out.print("ID: ");
+        String id = scanner.nextLine();
+
+        System.out.print("Nombre: ");
+        String title = scanner.nextLine();
+
+        System.out.print("Marca: ");
+        String brand = scanner.nextLine();
+
+        System.out.print("Modelo: ");
+        String model = scanner.nextLine();
+
+        System.out.print("Generación: ");
+        String generation = scanner.nextLine();
+
+        System.out.print("Precio: ");
+        double price = Double.parseDouble(scanner.nextLine());
+
+        System.out.print("Stock: ");
+        int stock = Integer.parseInt(scanner.nextLine());
+
+        try {
+            productService.registerConsole(
+                    id,
+                    title,
+                    brand,
+                    model,
+                    generation,
+                    price,
+                    stock
+            );
+
+            System.out.println("Consola registrada correctamente.");
+        } catch (Exception e) {
+            System.out.println("Error al registrar la consola: " + e.getMessage());
+        }
+    }
+    /**
+     * Displays all registered products.
+     */
+    private void listProducts() {
+        System.out.println("\n===== PRODUCTOS =====");
+
+        try {
+            List<Product> products = productService.listAllProducts();
+
+            if (products.isEmpty()) {
+                System.out.println("No hay productos registrados.");
+                return;
+            }
+
+            for (Product product : products) {
+                System.out.println(
+                        "ID: " + product.getId()
+                                + " | Nombre: " + product.getTitle()
+                                + " | Precio: $" + product.getPrice()
+                                + " | Stock: " + product.getStock()
+                );
+            }
+        } catch (Exception e) {
+            System.out.println("Error al listar los productos: " + e.getMessage());
+        }
+    }
+
 
     /**
      * Displays all registered sellers.
