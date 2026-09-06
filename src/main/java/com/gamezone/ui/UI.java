@@ -4,6 +4,7 @@ import com.gamezone.service.PersonService;
 import com.gamezone.service.ProductService;
 import com.gamezone.service.SaleService;
 import com.gamezone.model.Product;
+import com.gamezone.model.Sale;
 import java.util.List;
 import java.util.Scanner;
 
@@ -70,6 +71,9 @@ public class UI {
                     break;
                 case "6":
                     listSellers();
+                    break;
+                case "7":
+                    registerSale();
                     break;
             }
         }
@@ -262,6 +266,61 @@ public class UI {
                             + " | Teléfono: " + customer.getPhone()
                             + " | Correo: " + customer.getEmail()
             );
+        }
+    }
+    /**
+     * Registers a new sale using customer, seller, and selected products.
+     */
+    private void registerSale() {
+        System.out.println("\n===== REGISTRAR VENTA =====");
+
+        System.out.print("ID del cliente: ");
+        String customerId = scanner.nextLine();
+
+        System.out.print("ID del vendedor: ");
+        String sellerId = scanner.nextLine();
+
+        List<String> productIds = new java.util.ArrayList<>();
+
+        System.out.println("\nIngrese los productos de la venta.");
+        System.out.println("Escriba FIN cuando haya terminado.");
+
+        while (true) {
+            System.out.print("ID del producto: ");
+            String productId = scanner.nextLine();
+
+            if (productId.equalsIgnoreCase("FIN")) {
+                break;
+            }
+
+            if (productId.isBlank()) {
+                System.out.println("El ID del producto no puede estar vacío.");
+                continue;
+            }
+
+            productIds.add(productId);
+        }
+
+        if (productIds.isEmpty()) {
+            System.out.println("La venta debe contener al menos un producto.");
+            return;
+        }
+
+        try {
+            Sale sale = saleService.registerSale(
+                    customerId,
+                    sellerId,
+                    productIds
+            );
+
+            System.out.println("Venta registrada correctamente.");
+            System.out.println("Fecha: " + sale.getDate());
+            System.out.println("Cliente: " + sale.getCustomer().getName());
+            System.out.println("Vendedor: " + sale.getSeller().getName());
+            System.out.println("Total: $" + sale.calculateTotal());
+
+        } catch (Exception e) {
+            System.out.println("Error al registrar la venta: " + e.getMessage());
         }
     }
 }
