@@ -39,6 +39,7 @@ public class PersonService {
      * @return the newly created Customer
      */
     public Customer registerCustomer(String id, String name, String phone, String email) {
+        if (findCustomerById(id) != null) { throw new IllegalArgumentException("Customer ID already exists: " + id); }
         Customer customer = new Customer(id, name, phone, email);
         customers.add(customer);
         personRepository.saveCustomers(customers);
