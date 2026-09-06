@@ -75,6 +75,9 @@ public class UI {
                 case "7":
                     registerSale();
                     break;
+                case "8":
+                    listAllSales();
+                    break;
             }
         }
     }
@@ -321,6 +324,45 @@ public class UI {
 
         } catch (Exception e) {
             System.out.println("Error al registrar la venta: " + e.getMessage());
+        }
+    }
+    /**
+     * Displays the complete sales history.
+     */
+    private void listAllSales() {
+        System.out.println("\n===== HISTORIAL DE VENTAS =====");
+
+        try {
+            List<Sale> sales = saleService.listAllSales();
+
+            if (sales.isEmpty()) {
+                System.out.println("No hay ventas registradas.");
+                return;
+            }
+
+            for (Sale sale : sales) {
+                System.out.println(
+                        "Fecha: " + sale.getDate()
+                                + " | Cliente: " + sale.getCustomer().getName()
+                                + " | Vendedor: " + sale.getSeller().getName()
+                                + " | Total: $" + sale.calculateTotal()
+                );
+
+                System.out.println("Productos:");
+
+                for (Product product : sale.getProducts()) {
+                    System.out.println(
+                            "  - " + product.getTitle()
+                                    + " | Precio: $" + product.getPrice()
+                    );
+                }
+
+                System.out.println();
+            }
+        } catch (Exception e) {
+            System.out.println(
+                    "Error al listar el historial de ventas: " + e.getMessage()
+            );
         }
     }
 }
