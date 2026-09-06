@@ -22,10 +22,20 @@ public class Customer extends Person {
         this.email = email;
     }
 
+    /**
+ * Returns the email address of this customer.
+ *
+ * @return the customer's email
+ */
     public String getEmail() {
         return email;
     }
 
+    /**
+ * Updates the email address of this customer.
+ *
+ * @param email the new email
+ */
     public void setEmail(String email) {
         this.email = email;
     }
