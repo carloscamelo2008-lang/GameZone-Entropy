@@ -27,3 +27,6 @@ replay_pid*
 
 # Maven
 target/
+# Application data generated at runtime
+data/*.csv
+data/*.dat
