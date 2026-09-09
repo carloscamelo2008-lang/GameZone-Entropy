@@ -1,6 +1,6 @@
 # Class Diagram
 
-The following diagram represents the complete class structure of the GameZone Unicesar system, including the model, persistence, service, and user interface layers.
+The following diagram represents the class structure of the GameZone Unicesar system, including the model, persistence, service, and user interface layers.
 
 ```mermaid
 classDiagram
@@ -90,14 +90,12 @@ classDiagram
         +calculateTotal() double
     }
 
-    %% Inheritance relationships
     Product <|-- VideoGame
     Product <|-- Console
 
     Person <|-- Customer
     Person <|-- Seller
 
-    %% Sale relationships
     Sale --> "1" Customer : belongs to
     Sale --> "1" Seller : attended by
     Sale --> "1..*" Product : contains
@@ -109,6 +107,7 @@ classDiagram
 
     class ProductRepository {
         -String filePath
+        +ProductRepository(String filePath)
         +saveAll(List~Product~ products) void
         +loadAll() List~Product~
     }
@@ -116,6 +115,7 @@ classDiagram
     class PersonRepository {
         -String customersFilePath
         -String sellersFilePath
+        +PersonRepository(String customersFilePath, String sellersFilePath)
         +saveCustomers(List~Customer~ customers) void
         +loadCustomers() List~Customer~
         +saveSellers(List~Seller~ sellers) void
@@ -124,11 +124,11 @@ classDiagram
 
     class SaleRepository {
         -String filePath
+        +SaleRepository(String filePath)
         +saveAll(List~Sale~ sales) void
         +loadAll() List~Sale~
     }
 
-    %% Persistence dependencies
     ProductRepository ..> Product : persists
     PersonRepository ..> Customer : persists
     PersonRepository ..> Seller : persists
@@ -142,18 +142,20 @@ classDiagram
     class ProductService {
         -ProductRepository repository
         -List~Product~ products
-        +registerVideoGame(...) VideoGame
-        +registerConsole(...) Console
+        +ProductService(ProductRepository repository)
         +listAllProducts() List~Product~
-        +reduceStock(String id, int quantity) void
         +hasSufficientStock(String id, int quantity) boolean
+        +reduceStock(String id, int quantity) void
+        +registerVideoGame(String id, String title, double price, int stock, String platform, String genre, String ageRating) VideoGame
+        +registerConsole(String id, String title, String brand, String model, String generation, double price, int stock) Console
     }
 
     class PersonService {
-        -PersonRepository repository
+        -PersonRepository personRepository
         -List~Customer~ customers
         -List~Seller~ sellers
-        +registerCustomer(...) Customer
+        +PersonService(PersonRepository personRepository)
+        +registerCustomer(String id, String name, String phone, String email) Customer
         +listCustomers() List~Customer~
         +listSellers() List~Seller~
         +findCustomerById(String id) Customer
@@ -161,15 +163,18 @@ classDiagram
     }
 
     class SaleService {
-        -SaleRepository repository
+        -SaleRepository saleRepository
+        -ProductService productService
+        -PersonService personService
         -List~Sale~ sales
-        +createSale(Customer customer, Seller seller, List~Product~ products) Sale
-        +listSales() List~Sale~
-        +getCustomerPurchaseHistory(String customerId) List~Sale~
-        +getSellerSalesHistory(String sellerId) List~Sale~
+        +SaleService(SaleRepository saleRepository, ProductService productService, PersonService personService)
+        +registerSale(String customerId, String sellerId, List~String~ productIds) Sale
+        +listAllSales() List~Sale~
+        +listCustomerSales(String customerId) List~Sale~
+        +listSellerSales(String sellerId) List~Sale~
+        -findProductById(String id) Product
     }
 
-    %% Service dependencies
     ProductService --> ProductRepository : uses
     ProductService --> "0..*" Product : manages
 
@@ -178,7 +183,7 @@ classDiagram
     PersonService --> "0..*" Seller : manages
 
     SaleService --> SaleRepository : uses
-    SaleService --> Sale : manages
+    SaleService --> "0..*" Sale : manages
     SaleService --> ProductService : uses
     SaleService --> PersonService : uses
 
@@ -192,11 +197,11 @@ classDiagram
         -PersonService personService
         -SaleService saleService
         -Scanner scanner
+        +UI(ProductService productService, PersonService personService, SaleService saleService)
         +start() void
         -showMenu() void
     }
 
-    %% UI may depend only on services
     UI --> ProductService : uses
     UI --> PersonService : uses
     UI --> SaleService : uses
