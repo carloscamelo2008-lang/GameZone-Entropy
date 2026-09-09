@@ -4,7 +4,7 @@
 
 GameZone Unicesar is a video game and console store located in the university sector of Valledupar. The business sells video games and consoles to the general public and requires an information system to replace the manual processes currently used.
 
-The system must manage information about people, products, and sales while preserving the information between executions.
+The system manages information about people, products, and sales while preserving the information between executions.
 
 ## Team
 
@@ -18,7 +18,7 @@ The project is developed by the Entropy team.
 
 The objective of the system is to organize and manage the main operations of GameZone through an object-oriented Java application organized into four architectural layers.
 
-The design will apply encapsulation, inheritance, polymorphism, abstract classes, and separation of responsibilities between the model, persistence, service, and user interface layers.
+The implementation applies encapsulation, inheritance, polymorphism, abstract classes, and separation of responsibilities between the model, persistence, service, and user interface layers.
 
 # Analysis Questions
 
@@ -26,22 +26,22 @@ The design will apply encapsulation, inheritance, polymorphism, abstract classes
 
 All people interacting with the store share basic information such as name, identification, and contact phone.
 
-These common attributes should belong to a common abstract `Person` class because they represent information shared by different types of people.
+These common attributes belong to the abstract `Person` class because they represent information shared by different types of people.
 
-Specific information should belong to specialized classes:
+Specific information belongs to specialized classes:
 
-- `Customer` represents customers and their purchase-related information.
+- `Customer` represents customers and contains their identification and contact information.
 - `Seller` represents sellers and includes an employee code and a work shift.
 
-This distinction can be represented through inheritance, with `Customer` and `Seller` extending `Person`.
+This distinction is represented through inheritance, with `Customer` and `Seller` extending `Person`.
 
 This design avoids duplicating common attributes and allows each specialized class to contain the information specific to its role.
 
 ## 2. Generic person class
 
-A generic `Person` class should exist as an abstract class because the system needs concrete roles that interact with the store, such as customers and sellers.
+A generic `Person` class exists as an abstract class because the system works with concrete roles that interact with the store, such as customers and sellers.
 
-A generic person should not be instantiated directly because a person without a defined role does not represent a specific business entity in the context of GameZone.
+A generic person is not instantiated directly because a person without a defined role does not represent a specific business entity in the context of GameZone.
 
 Declaring `Person` as abstract allows it to define common attributes and behavior while requiring concrete subclasses to represent the actual types of people used by the application.
 
@@ -54,7 +54,7 @@ All products sold by the store share common information:
 - Price
 - Available quantity in inventory
 
-These characteristics should belong to an abstract `Product` class.
+These characteristics belong to the abstract `Product` class.
 
 Specialized products contain additional attributes.
 
@@ -76,11 +76,11 @@ This structure allows common product information to be reused while preserving t
 
 Every product type must be able to present a complete description that includes its particular characteristics.
 
-The `Product` class should therefore declare an abstract behavior such as `getDescription()`.
+The `Product` class therefore declares the abstract behavior `getDescription()`.
 
-Each concrete product subclass must implement this behavior according to its own characteristics.
+Each concrete product subclass implements this behavior according to its own characteristics.
 
-For example, a video game description should include its platform, genre, and recommended age rating, while a console description should include its brand, model, and generation.
+For example, a video game description includes its platform, genre, and recommended age rating, while a console description includes its brand, model, and generation.
 
 Declaring this behavior as abstract guarantees that every concrete product provides its own implementation and allows the system to apply polymorphism.
 
@@ -100,42 +100,42 @@ The minimum of one product is a business rule required for a sale to be valid.
 
 ## 6. Responsibility for calculating the sale total
 
-The `Sale` should be responsible for calculating its own total because the total is derived from the products included in that sale.
+The `Sale` is responsible for calculating its own total because the total is derived from the products included in that sale.
 
 Keeping this behavior inside `Sale` follows the principle of assigning behavior to the object that owns the relevant information.
 
-The service layer should coordinate the sale process and validate business rules, while the domain object should encapsulate the calculation related to its own data.
+The service layer coordinates the sale process and validates business rules, while the domain object encapsulates the calculation related to its own data.
 
-Therefore, the design can include a behavior such as `calculateTotal()` in `Sale`.
+Therefore, `Sale` provides behavior for calculating the total of the transaction.
 
 ## 7. Guaranteeing that a sale contains at least one product
 
 A sale must not be registered without at least one product.
 
-This rule should be validated in the service layer before the sale is persisted because the service layer is responsible for business rules.
+This rule is validated in the service layer before the sale is persisted because the service layer is responsible for business rules.
 
-The `Sale` object must represent the collection of products involved in the transaction.
+The `Sale` object represents the collection of products involved in the transaction.
 
-When the collection is empty, the service must reject the operation and prevent the sale from being stored.
+When the collection is empty, the service rejects the operation and prevents the sale from being stored.
 
 This guarantees that invalid sales do not reach the persistence layer.
 
 ## 8. Automatic inventory update after a sale
 
-When a sale is registered, the available quantity of each sold product must be reduced automatically.
+When a sale is registered, the available quantity of each sold product is reduced automatically.
 
-The sale process should be coordinated by the service layer because the operation involves validations and several domain objects.
+The sale process is coordinated by the service layer because the operation involves validations and several domain objects.
 
-The `SaleService` should:
+The `SaleService` performs the following process:
 
-1. Validate that the sale contains at least one product.
-2. Verify that each product has enough available inventory.
-3. Calculate or obtain the sale total.
-4. Update the inventory quantities.
-5. Persist the updated products.
-6. Persist the sale.
+1. Validates that the sale contains at least one product.
+2. Verifies that each product has enough available inventory.
+3. Builds the collection of products included in the sale.
+4. Reduces the inventory quantities after all stock validations succeed.
+5. Creates the sale and calculates its total.
+6. Persists the sale.
 
-The `Product` objects contain the inventory information, while persistence is responsible for storing the updated information in files.
+The `Product` objects contain the inventory information, while the persistence layer stores the updated product information in files.
 
 This separation prevents the user interface from directly manipulating persistence or business data.
 
@@ -161,11 +161,23 @@ Examples include:
 
 The persistence layer contains the classes responsible for saving and recovering information from files.
 
-These classes must focus on storage and retrieval and must not contain business rules that belong to the service layer.
+The current persistence classes are:
+
+- `PersonRepository`
+- `ProductRepository`
+- `SaleRepository`
+
+These classes focus on storage and retrieval and do not contain business rules that belong to the service layer.
 
 ### Services
 
 The service layer contains the business rules and coordinates operations between the user interface, domain objects, and persistence classes.
+
+The current service classes are:
+
+- `PersonService`
+- `ProductService`
+- `SaleService`
 
 The services are responsible for validations and for coordinating operations such as product management, person management, and sales.
 
@@ -173,7 +185,7 @@ The services are responsible for validations and for coordinating operations suc
 
 The user interface contains the console menu through which users execute the system operations.
 
-The UI must use service classes and must not access persistence directly.
+The UI uses service classes and does not access persistence directly.
 
 The criterion for assigning a class to a layer is its responsibility:
 
@@ -194,25 +206,27 @@ Keeping persistence in a separate layer preserves separation of responsibilities
 
 ## 11. Allowed and forbidden dependencies between layers
 
-The allowed dependency direction is:
+The application follows these dependency relationships:
 
 ```text
-UI → Service → Persistence → Model
+UI → Service
+Service → Persistence
+Service → Model
+Persistence → Model
 ```
-
-The service layer may also depend directly on the model.
 
 The user interface depends on services because it requests business operations from them.
 
-The service layer depends on persistence because it must save and retrieve data through persistence classes, and it depends on the model because it operates on domain objects.
+The service layer depends on persistence because it must save and retrieve information through persistence classes, and it depends on the model because it operates on domain objects.
 
 The persistence layer depends on the model because it stores and reconstructs domain objects.
 
-The model does not depend on any other layer.
+The model does not depend on the other application layers.
 
 The following dependencies are forbidden:
 
 - UI → Persistence
+- UI → Model
 - Model → Persistence
 - Model → Service
 - Model → UI
@@ -221,7 +235,7 @@ These restrictions prevent responsibilities from different layers from becoming 
 
 # Functional Operations
 
-The console menu must support the following operations.
+The console menu supports the following operations.
 
 ## Product Management
 
@@ -242,64 +256,74 @@ The console menu must support the following operations.
 9. Consult the purchase history of a specific customer.
 10. Consult the sales handled by a specific seller.
 
-The application must also load stored information automatically when it starts and save changes automatically after each operation.
+The application also loads previously stored information when it starts, and changes made through the system are persisted by the corresponding persistence classes.
 
 # Business Rules
 
-The design must enforce the following business rules:
+The implemented system enforces the following business rules:
 
 - A sale must contain at least one product.
 - A product cannot be sold when the available inventory is insufficient.
-- The inventory must be reduced when a sale is registered.
-- The total value of a sale must be calculated from the products included in the transaction.
-- Previously stored information must remain available between executions.
-- The application must load stored information when it starts.
-- The system must start with at least three sellers preloaded in the corresponding data file because sellers are not registered through the user interface.
+- The inventory is reduced when a sale is registered.
+- The total value of a sale is calculated from the products included in the transaction.
+- Previously stored information remains available between executions.
+- The application loads stored information when it starts.
+- The system starts with at least three sellers preloaded in the corresponding data file because sellers are not registered through the user interface.
+- A customer cannot be registered when another customer already uses the same identification.
 
 # Persistence
 
-All information managed by the system must be preserved between executions.
+The system preserves the information it manages between executions by using files.
 
-The application must store products, people, and sales in files managed by the application.
+The current implementation uses:
 
-When the application starts, previously stored information must be loaded automatically.
+- `data/customers.csv` for customer information.
+- `data/sellers.csv` for the preloaded seller information.
+- `data/products.dat` for product information.
+- `data/sales.dat` for sales information.
 
-The file format will be selected by the team according to the workshop requirements, provided that the information is preserved correctly between executions.
+The application loads previously stored information when it starts.
+
+The file format is selected according to the type of information being stored. CSV is used for person information, while Java serialization is used for products and sales.
+
+The `data/sellers.csv` file contains the sellers required for the initial execution.
 
 # Architectural Principles
 
-The implementation must follow these principles:
+The implementation follows these principles:
 
-- All domain attributes must be private.
-- General categories that should not be instantiated directly must be abstract.
-- Specialized behavior must be represented using abstract methods where appropriate.
-- Concrete subclasses must implement inherited abstract behavior.
-- The model must remain independent from persistence and user interface concerns.
-- The user interface must access the system through services.
-- File access must remain inside the persistence layer.
-- All class names, attributes, and methods must be written in English.
-- Classes must use PascalCase.
-- Attributes and methods must use camelCase.
-- The design must not introduce classes, attributes, or methods that are not justified by the context of the system.
+- All domain attributes are private.
+- General categories that should not be instantiated directly are abstract.
+- Specialized behavior is represented using abstract methods where appropriate.
+- Concrete subclasses implement inherited abstract behavior.
+- The model remains independent from persistence and user interface concerns.
+- The user interface accesses the system through services.
+- File access remains inside the persistence layer.
+- All class names, attributes, and methods are written in English.
+- Classes use PascalCase.
+- Attributes and methods use camelCase.
+- Classes, attributes, and methods are introduced according to the context and responsibilities of the system.
 
-# Initial Design Decisions
+# Design Decisions
 
-The domain will contain at least two inheritance hierarchies:
+The domain contains two inheritance hierarchies:
 
 1. `Person` → `Customer`, `Seller`
 2. `Product` → `VideoGame`, `Console`
 
-The final class structure, attributes, methods, relationships, multiplicities, and layer assignments will be represented in the corresponding Mermaid diagrams:
+`Person` and `Product` are abstract classes, while their specialized subclasses are concrete.
+
+The final class structure, attributes, methods, relationships, multiplicities, and layer assignments are represented in the corresponding Mermaid diagrams:
 
 - `docs/hierarchy-diagram.md`
 - `docs/class-diagram.md`
 - `docs/layers-diagram.md`
 
-These diagrams will serve as the reference for the implementation.
+These diagrams document the implemented design.
 
 # Implementation Structure
 
-The application will use the following package structure:
+The application is organized using the following package structure:
 
 ```text
 com.gamezone
@@ -318,4 +342,4 @@ The `service` package contains business logic and rules.
 
 The `ui` package contains the console menu.
 
-The `Main` class starts the application and coordinates the application startup.
+The `Main` class starts the application and initializes the repositories, services, and user interface.
