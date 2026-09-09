@@ -1,6 +1,6 @@
 # Layers Diagram
 
-The following diagram represents the four architectural layers of the GameZone Unicesar system, the classes belonging to each layer, and the allowed dependencies between layers.
+The following diagram represents the four architectural layers of the GameZone Unicesar system, the classes belonging to each layer, the application entry point, and the allowed dependencies between them.
 
 ```mermaid
 flowchart TD
@@ -60,13 +60,27 @@ flowchart TD
     Main --> UIClass
 
     %% ==========================================
-    %% ALLOWED LAYER DEPENDENCIES
+    %% ALLOWED DEPENDENCIES
     %% ==========================================
 
-    UIClass --> SERVICE
+    UIClass --> ProductService
+    UIClass --> PersonService
+    UIClass --> SaleService
 
-    SERVICE --> PERSISTENCE
-    SERVICE --> MODEL
+    ProductService --> ProductRepository
+    ProductService --> Product
 
-    PERSISTENCE --> MODEL
+    PersonService --> PersonRepository
+    PersonService --> Customer
+    PersonService --> Seller
+
+    SaleService --> SaleRepository
+    SaleService --> ProductService
+    SaleService --> PersonService
+    SaleService --> Sale
+
+    ProductRepository --> Product
+    PersonRepository --> Customer
+    PersonRepository --> Seller
+    SaleRepository --> Sale
 ```
