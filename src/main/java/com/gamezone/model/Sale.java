@@ -81,4 +81,16 @@ public class Sale implements Serializable {
 
         return total;
     }
+
+    /**
+     * Checks whether this sale is still within the 30-day window
+     * allowed for returns, counted from the sale's date.
+     *
+     * @return true if the sale can still be returned
+     */
+    public boolean canBeReturned() {
+        long daysSinceSale = java.time.temporal.ChronoUnit.DAYS.between(
+                getDate().toLocalDate(), java.time.LocalDate.now());
+        return daysSinceSale <= 30;
+    }
 }
