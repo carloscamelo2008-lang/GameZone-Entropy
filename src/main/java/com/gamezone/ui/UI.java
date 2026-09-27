@@ -7,6 +7,8 @@ import com.gamezone.model.Product;
 import com.gamezone.model.Sale;
 import java.util.List;
 import java.util.Scanner;
+import com.gamezone.model.Accessory;
+import com.gamezone.service.AccessoryService;
 
 /**
  * Provides the console-based user interface for GameZone.
@@ -15,6 +17,7 @@ public class UI {
 
     private final PersonService personService;
     private final ProductService productService;
+    private final AccessoryService accessoryService;
     private final SaleService saleService;
     private final Scanner scanner;
 
@@ -24,18 +27,20 @@ public class UI {
      * @param personService service used to manage customers and sellers
      * @param productService service used to manage products
      * @param saleService service used to manage sales
+     * @param accessoryService service used to manage accessories
      */
     public UI(
             PersonService personService,
             ProductService productService,
+            AccessoryService accessoryService,
             SaleService saleService) {
 
         this.personService = personService;
         this.productService = productService;
+        this.accessoryService = accessoryService;
         this.saleService = saleService;
         this.scanner = new Scanner(System.in);
     }
-
     /**
      * Starts the console user interface.
      */
@@ -84,6 +89,9 @@ public class UI {
                 case "10":
                     listSellerSales();
                     break;
+                case "11":
+                    manageAccessories();
+                    break;
                 default:
                     System.out.println("Opción no válida. Intente nuevamente.");
                     break;
@@ -107,6 +115,7 @@ public class UI {
         System.out.println("8. Listar historial de ventas");
         System.out.println("9. Historial de compras de cliente");
         System.out.println("10. Historial de ventas de vendedor");
+        System.out.println("11. Gestionar accesorios");
         System.out.println("0. Salir");
         System.out.print("Seleccione una opción: ");
     }
@@ -457,6 +466,267 @@ public class UI {
             System.out.println(
                     "Error al consultar el historial del vendedor: "
                             + e.getMessage()
+            );
+        }
+    }
+    /**
+     * Displays the accessory management submenu.
+     */
+    private void manageAccessories() {
+        boolean running = true;
+
+        while (running) {
+            System.out.println();
+            System.out.println("===== GESTIONAR ACCESORIOS =====");
+            System.out.println("1. Registrar controlador");
+            System.out.println("2. Registrar cable");
+            System.out.println("3. Registrar memoria");
+            System.out.println("4. Listar accesorios");
+            System.out.println("5. Listar accesorios por tipo");
+            System.out.println("6. Buscar accesorios compatibles");
+            System.out.println("0. Volver");
+
+            System.out.print("Seleccione una opción: ");
+            String option = scanner.nextLine();
+
+            switch (option) {
+                case "1":
+                    registerController();
+                    break;
+                case "2":
+                    registerCable();
+                    break;
+                case "3":
+                    registerMemory();
+                    break;
+                case "4":
+                    listAccessories();
+                    break;
+                case "5":
+                    listAccessoriesByType();
+                    break;
+                case "6":
+                    findCompatibleAccessories();
+                    break;
+                case "0":
+                    running = false;
+                    break;
+                default:
+                    System.out.println("Opción no válida. Intente nuevamente.");
+                    break;
+            }
+        }
+    }
+    /**
+     * Registers a controller through the console.
+     */
+    private void registerController() {
+        System.out.println("\n===== REGISTRAR CONTROLADOR =====");
+
+        System.out.print("ID: ");
+        String id = scanner.nextLine();
+
+        System.out.print("Nombre: ");
+        String title = scanner.nextLine();
+
+        System.out.print("Precio: ");
+        double price = Double.parseDouble(scanner.nextLine());
+
+        System.out.print("Stock: ");
+        int stock = Integer.parseInt(scanner.nextLine());
+
+        System.out.print("Tipo de conexión: ");
+        String connectionType = scanner.nextLine();
+
+        try {
+            accessoryService.registerController(
+                    id,
+                    title,
+                    price,
+                    stock,
+                    connectionType
+            );
+
+            System.out.println("Controlador registrado correctamente.");
+        } catch (Exception e) {
+            System.out.println(
+                    "Error al registrar el controlador: " + e.getMessage()
+            );
+        }
+    }
+    /**
+     * Registers a cable through the console.
+     */
+    private void registerCable() {
+        System.out.println("\n===== REGISTRAR CABLE =====");
+
+        System.out.print("ID: ");
+        String id = scanner.nextLine();
+
+        System.out.print("Nombre: ");
+        String title = scanner.nextLine();
+
+        System.out.print("Precio: ");
+        double price = Double.parseDouble(scanner.nextLine());
+
+        System.out.print("Stock: ");
+        int stock = Integer.parseInt(scanner.nextLine());
+
+        System.out.print("Longitud en metros: ");
+        double lengthInMeters = Double.parseDouble(scanner.nextLine());
+
+        System.out.print("Tipo de conector: ");
+        String connectorType = scanner.nextLine();
+
+        try {
+            accessoryService.registerCable(
+                    id,
+                    title,
+                    price,
+                    stock,
+                    lengthInMeters,
+                    connectorType
+            );
+
+            System.out.println("Cable registrado correctamente.");
+        } catch (Exception e) {
+            System.out.println(
+                    "Error al registrar el cable: " + e.getMessage()
+            );
+        }
+    }
+    /**
+     * Registers a memory accessory through the console.
+     */
+    private void registerMemory() {
+        System.out.println("\n===== REGISTRAR MEMORIA =====");
+
+        System.out.print("ID: ");
+        String id = scanner.nextLine();
+
+        System.out.print("Nombre: ");
+        String title = scanner.nextLine();
+
+        System.out.print("Precio: ");
+        double price = Double.parseDouble(scanner.nextLine());
+
+        System.out.print("Stock: ");
+        int stock = Integer.parseInt(scanner.nextLine());
+
+        System.out.print("Capacidad en GB: ");
+        int capacityInGb = Integer.parseInt(scanner.nextLine());
+
+        System.out.print("Tipo de memoria: ");
+        String memoryType = scanner.nextLine();
+
+        try {
+            accessoryService.registerMemory(
+                    id,
+                    title,
+                    price,
+                    stock,
+                    capacityInGb,
+                    memoryType
+            );
+
+            System.out.println("Memoria registrada correctamente.");
+        } catch (Exception e) {
+            System.out.println(
+                    "Error al registrar la memoria: " + e.getMessage()
+            );
+        }
+    }
+    /**
+     * Displays all registered accessories.
+     */
+    private void listAccessories() {
+        System.out.println("\n===== ACCESORIOS =====");
+
+        try {
+            List<Accessory> accessories = accessoryService.listAllAccessories();
+
+            if (accessories.isEmpty()) {
+                System.out.println("No hay accesorios registrados.");
+                return;
+            }
+
+            for (Accessory accessory : accessories) {
+                System.out.println(
+                        "ID: " + accessory.getId()
+                                + " | Nombre: " + accessory.getTitle()
+                                + " | Precio: $" + accessory.getPrice()
+                                + " | Stock: " + accessory.getStock()
+                );
+            }
+        } catch (Exception e) {
+            System.out.println(
+                    "Error al listar los accesorios: " + e.getMessage()
+            );
+        }
+    }
+    /**
+     * Displays accessories filtered by their concrete type.
+     */
+    private void listAccessoriesByType() {
+        System.out.println("\n===== ACCESORIOS POR TIPO =====");
+
+        System.out.print("Tipo (Controller, Cable o Memory): ");
+        String type = scanner.nextLine();
+
+        try {
+            List<Accessory> accessories =
+                    accessoryService.listAccessoriesByType(type);
+
+            if (accessories.isEmpty()) {
+                System.out.println("No hay accesorios de ese tipo.");
+                return;
+            }
+
+            for (Accessory accessory : accessories) {
+                System.out.println(
+                        "ID: " + accessory.getId()
+                                + " | Nombre: " + accessory.getTitle()
+                                + " | Precio: $" + accessory.getPrice()
+                                + " | Stock: " + accessory.getStock()
+                );
+            }
+        } catch (Exception e) {
+            System.out.println(
+                    "Error al filtrar los accesorios: " + e.getMessage()
+            );
+        }
+    }
+    /**
+     * Displays accessories compatible with a specific console.
+     */
+    private void findCompatibleAccessories() {
+        System.out.println("\n===== ACCESORIOS COMPATIBLES =====");
+
+        System.out.print("ID de la consola: ");
+        String consoleId = scanner.nextLine();
+
+        try {
+            List<Accessory> accessories =
+                    accessoryService.findAccessoriesCompatibleWith(consoleId);
+
+            if (accessories.isEmpty()) {
+                System.out.println(
+                        "No se encontraron accesorios compatibles."
+                );
+                return;
+            }
+
+            for (Accessory accessory : accessories) {
+                System.out.println(
+                        "ID: " + accessory.getId()
+                                + " | Nombre: " + accessory.getTitle()
+                                + " | Precio: $" + accessory.getPrice()
+                                + " | Stock: " + accessory.getStock()
+                );
+            }
+        } catch (Exception e) {
+            System.out.println(
+                    "Error al consultar compatibilidad: " + e.getMessage()
             );
         }
     }

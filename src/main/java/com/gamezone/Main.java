@@ -58,7 +58,12 @@ public class Main {
                         accessoryService,
                         personService
                 );
-        UI ui = new UI(personService, productService, saleService);
+        UI ui = new UI(
+                personService,
+                productService,
+                accessoryService,
+                saleService
+        );
         ui.start();
     }
 }
