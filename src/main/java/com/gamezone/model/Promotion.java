@@ -26,34 +26,74 @@ public abstract class Promotion {
         this.endDate = endDate;
     }
 
+    /**
+     * Returns the unique identifier of the promotion.
+     *
+     * @return the promotion id
+     */
     public String getId() {
         return id;
     }
 
+    /**
+     * Updates the unique identifier of the promotion.
+     *
+     * @param id the new promotion id
+     */
     public void setId(String id) {
         this.id = id;
     }
 
+    /**
+     * Returns the display name of the promotion.
+     *
+     * @return the promotion name
+     */
     public String getName() {
         return name;
     }
 
+    /**
+     * Updates the display name of the promotion.
+     *
+     * @param name the new promotion name
+     */
     public void setName(String name) {
         this.name = name;
     }
 
+    /**
+     * Returns the date the promotion becomes active.
+     *
+     * @return the start date
+     */
     public LocalDate getStartDate() {
         return startDate;
     }
 
+    /**
+     * Updates the date the promotion becomes active.
+     *
+     * @param startDate the new start date
+     */
     public void setStartDate(LocalDate startDate) {
         this.startDate = startDate;
     }
 
+    /**
+     * Returns the date the promotion stops being active.
+     *
+     * @return the end date
+     */
     public LocalDate getEndDate() {
         return endDate;
     }
 
+    /**
+     * Updates the date the promotion stops being active.
+     *
+     * @param endDate the new end date
+     */
     public void setEndDate(LocalDate endDate) {
         this.endDate = endDate;
     }
