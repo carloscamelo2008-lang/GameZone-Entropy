@@ -534,15 +534,18 @@ public class UI {
         String title = scanner.nextLine();
 
         System.out.print("Precio: ");
-        double price = Double.parseDouble(scanner.nextLine());
+        String priceInput = scanner.nextLine();
 
         System.out.print("Stock: ");
-        int stock = Integer.parseInt(scanner.nextLine());
+        String stockInput = scanner.nextLine();
 
         System.out.print("Tipo de conexión: ");
         String connectionType = scanner.nextLine();
 
         try {
+            double price = Double.parseDouble(priceInput);
+            int stock = Integer.parseInt(stockInput);
+
             accessoryService.registerController(
                     id,
                     title,
@@ -571,18 +574,22 @@ public class UI {
         String title = scanner.nextLine();
 
         System.out.print("Precio: ");
-        double price = Double.parseDouble(scanner.nextLine());
+        String priceInput = scanner.nextLine();
 
         System.out.print("Stock: ");
-        int stock = Integer.parseInt(scanner.nextLine());
+        String stockInput = scanner.nextLine();
 
         System.out.print("Longitud en metros: ");
-        double lengthInMeters = Double.parseDouble(scanner.nextLine());
+        String lengthInput = scanner.nextLine();
 
         System.out.print("Tipo de conector: ");
         String connectorType = scanner.nextLine();
 
         try {
+            double price = Double.parseDouble(priceInput);
+            int stock = Integer.parseInt(stockInput);
+            double lengthInMeters = Double.parseDouble(lengthInput);
+
             accessoryService.registerCable(
                     id,
                     title,
@@ -612,18 +619,22 @@ public class UI {
         String title = scanner.nextLine();
 
         System.out.print("Precio: ");
-        double price = Double.parseDouble(scanner.nextLine());
+        String priceInput = scanner.nextLine();
 
         System.out.print("Stock: ");
-        int stock = Integer.parseInt(scanner.nextLine());
+        String stockInput = scanner.nextLine();
 
         System.out.print("Capacidad en GB: ");
-        int capacityInGb = Integer.parseInt(scanner.nextLine());
+        String capacityInput = scanner.nextLine();
 
         System.out.print("Tipo de memoria: ");
         String memoryType = scanner.nextLine();
 
         try {
+            double price = Double.parseDouble(priceInput);
+            int stock = Integer.parseInt(stockInput);
+            int capacityInGb = Integer.parseInt(capacityInput);
+
             accessoryService.registerMemory(
                     id,
                     title,
@@ -655,12 +666,7 @@ public class UI {
             }
 
             for (Accessory accessory : accessories) {
-                System.out.println(
-                        "ID: " + accessory.getId()
-                                + " | Nombre: " + accessory.getTitle()
-                                + " | Precio: $" + accessory.getPrice()
-                                + " | Stock: " + accessory.getStock()
-                );
+                System.out.println(accessory.getDescription());
             }
         } catch (Exception e) {
             System.out.println(
@@ -687,12 +693,7 @@ public class UI {
             }
 
             for (Accessory accessory : accessories) {
-                System.out.println(
-                        "ID: " + accessory.getId()
-                                + " | Nombre: " + accessory.getTitle()
-                                + " | Precio: $" + accessory.getPrice()
-                                + " | Stock: " + accessory.getStock()
-                );
+                System.out.println(accessory.getDescription());
             }
         } catch (Exception e) {
             System.out.println(
@@ -721,12 +722,7 @@ public class UI {
             }
 
             for (Accessory accessory : accessories) {
-                System.out.println(
-                        "ID: " + accessory.getId()
-                                + " | Nombre: " + accessory.getTitle()
-                                + " | Precio: $" + accessory.getPrice()
-                                + " | Stock: " + accessory.getStock()
-                );
+                System.out.println(accessory.getDescription());
             }
         } catch (Exception e) {
             System.out.println(
