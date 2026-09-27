@@ -154,4 +154,30 @@ public class AccessoryService {
             accessoryRepository.saveAll(accessories);
         }
     }
+    /**
+     * Adds a compatible console to an accessory and persists the change.
+     *
+     * @param accessoryId the id of the accessory
+     * @param consoleId the id of the compatible console
+     */
+    public void addCompatibleConsole(String accessoryId, String consoleId) {
+        Accessory accessory = findById(accessoryId);
+
+        if (accessory == null) {
+            throw new IllegalArgumentException(
+                    "Accessory not found: " + accessoryId
+            );
+        }
+
+        if (consoleId == null || consoleId.isBlank()) {
+            throw new IllegalArgumentException(
+                    "Console ID cannot be empty."
+            );
+        }
+
+        if (!accessory.getCompatibleConsoleIds().contains(consoleId)) {
+            accessory.addCompatibleConsole(consoleId);
+            accessoryRepository.saveAll(accessories);
+        }
+    }
 }
