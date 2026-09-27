@@ -30,3 +30,4 @@ target/
 # Application data generated at runtime
 data/*.csv
 data/*.dat
+!data/accessories.csv

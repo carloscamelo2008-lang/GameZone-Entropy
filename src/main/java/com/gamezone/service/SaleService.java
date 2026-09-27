@@ -12,6 +12,7 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
+import com.gamezone.model.Accessory;
 /**
  * Contains the business rules related to sales.
  */
@@ -20,26 +21,29 @@ public class SaleService {
     private final SaleRepository saleRepository;
     private final ProductService productService;
     private final PersonService personService;
+    private final AccessoryService accessoryService;
     private final List<Sale> sales;
     /**
      * Creates a sale service and loads previously stored sales.
      *
      * @param saleRepository repository used to persist sales
      * @param productService service used to access and update products
+     * @param accessoryService service used to access and update accessories
      * @param personService service used to find customers and sellers
      */
     public SaleService(
             SaleRepository saleRepository,
             ProductService productService,
+            AccessoryService accessoryService,
             PersonService personService) {
 
         this.saleRepository = saleRepository;
         this.productService = productService;
+        this.accessoryService = accessoryService;
         this.personService = personService;
 
         this.sales = saleRepository.loadAll();
     }
-
 
     /**
      * Registers a new sale after validating the customer, seller,
@@ -86,17 +90,29 @@ public class SaleService {
             String productId = entry.getKey();
             int quantity = entry.getValue();
 
-            Product product = findProductById(productId);
+
+
+            Product product = findItemById(productId);
 
             if (product == null) {
                 throw new IllegalArgumentException(
-                        "Product not found: " + productId
+                        "Product or accessory not found: " + productId
                 );
             }
 
-            if (!productService.hasSufficientStock(productId, quantity)) {
+            boolean sufficientStock;
+
+            if (product instanceof Accessory) {
+                sufficientStock =
+                        product.getStock() >= quantity;
+            } else {
+                sufficientStock =
+                        productService.hasSufficientStock(productId, quantity);
+            }
+
+            if (!sufficientStock) {
                 throw new IllegalArgumentException(
-                        "Insufficient stock for product: " + productId
+                        "Insufficient stock for item: " + productId
                 );
             }
 
@@ -106,10 +122,17 @@ public class SaleService {
         }
 
         for (Map.Entry<String, Integer> entry : quantities.entrySet()) {
-            productService.reduceStock(
-                    entry.getKey(),
-                    entry.getValue()
-            );
+
+            String itemId = entry.getKey();
+            int quantity = entry.getValue();
+
+            Accessory accessory = accessoryService.findById(itemId);
+
+            if (accessory != null) {
+                accessoryService.updateStock(itemId, -quantity);
+            } else {
+                productService.reduceStock(itemId, quantity);
+            }
         }
 
         Sale sale = new Sale(
@@ -125,16 +148,22 @@ public class SaleService {
         return sale;
     }
     /**
-     * Finds a product by its id.
+     * Finds a product or accessory by its id.
      *
-     * @param id the id of the product to find
-     * @return the matching product, or null if not found
+     * @param id the id of the item to find
+     * @return the matching product or accessory, or null if not found
      */
-    private Product findProductById(String id) {
+    private Product findItemById(String id) {
         for (Product product : productService.listAllProducts()) {
             if (product.getId().equals(id)) {
                 return product;
             }
+        }
+
+        Accessory accessory = accessoryService.findById(id);
+
+        if (accessory != null) {
+            return accessory;
         }
 
         return null;
