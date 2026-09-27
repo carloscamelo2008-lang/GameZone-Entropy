@@ -484,6 +484,7 @@ public class UI {
             System.out.println("4. Listar accesorios");
             System.out.println("5. Listar accesorios por tipo");
             System.out.println("6. Buscar accesorios compatibles");
+            System.out.println("7. Asignar consola compatible");
             System.out.println("0. Volver");
 
             System.out.print("Seleccione una opción: ");
@@ -507,6 +508,9 @@ public class UI {
                     break;
                 case "6":
                     findCompatibleAccessories();
+                    break;
+                case "7":
+                    assignCompatibleConsole();
                     break;
                 case "0":
                     running = false;
@@ -727,6 +731,34 @@ public class UI {
         } catch (Exception e) {
             System.out.println(
                     "Error al consultar compatibilidad: " + e.getMessage()
+            );
+        }
+    }
+    /**
+     * Assigns a compatible console to an accessory.
+     */
+    private void assignCompatibleConsole() {
+        System.out.println("\n===== ASIGNAR CONSOLA COMPATIBLE =====");
+
+        System.out.print("ID del accesorio: ");
+        String accessoryId = scanner.nextLine();
+
+        System.out.print("ID de la consola: ");
+        String consoleId = scanner.nextLine();
+
+        try {
+            accessoryService.addCompatibleConsole(
+                    accessoryId,
+                    consoleId
+            );
+
+            System.out.println(
+                    "Consola compatible asignada correctamente."
+            );
+        } catch (Exception e) {
+            System.out.println(
+                    "Error al asignar la consola compatible: "
+                            + e.getMessage()
             );
         }
     }
