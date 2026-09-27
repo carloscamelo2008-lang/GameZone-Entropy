@@ -5,7 +5,9 @@ import com.gamezone.model.ExtendedWarranty;
 import com.gamezone.model.Product;
 import com.gamezone.model.Sale;
 import com.gamezone.model.Warranty;
+import com.gamezone.persistence.SaleRepository;
 import com.gamezone.persistence.WarrantyRepository;
+import com.gamezone.persistence.WarrantyRepository.WarrantyRecord;
 
 import java.time.LocalDate;
 import java.util.ArrayList;
@@ -15,21 +17,31 @@ import java.util.UUID;
 /**
  * Contains the business rules related to product warranties, including
  * assignment of basic and extended warranties, and queries about their
- * validity.
+ * validity. This service resolves the Sale and Product references for
+ * each warranty using {@link SaleRepository} and {@link ProductService}
+ * directly, which avoids the circular dependency that would arise if
+ * {@link WarrantyRepository} depended on SaleService instead.
  */
 public class WarrantyService {
 
     private final WarrantyRepository warrantyRepository;
+    private final SaleRepository saleRepository;
+    private final ProductService productService;
     private final List<Warranty> warranties;
 
     /**
-     * Creates a warranty service and loads previously stored warranties.
+     * Creates a warranty service, loading previously stored warranties
+     * and resolving their Sale and Product references.
      *
-     * @param warrantyRepository repository used to persist warranties
+     * @param warrantyRepository repository used to persist raw warranty records
+     * @param saleRepository     repository used to resolve sale references
+     * @param productService     service used to resolve product references
      */
-    public WarrantyService(WarrantyRepository warrantyRepository) {
+    public WarrantyService(WarrantyRepository warrantyRepository, SaleRepository saleRepository, ProductService productService) {
         this.warrantyRepository = warrantyRepository;
-        this.warranties = warrantyRepository.loadAll();
+        this.saleRepository = saleRepository;
+        this.productService = productService;
+        this.warranties = resolveWarranties(warrantyRepository.loadAll());
     }
 
     /**
@@ -75,8 +87,7 @@ public class WarrantyService {
      */
     public Warranty findWarrantyByProduct(String productId, String saleId) {
         for (Warranty warranty : warranties) {
-            String warrantySaleId = warranty.getSale().getDate() + "|" + warranty.getSale().getCustomer().getId();
-            if (warranty.getProduct().getId().equals(productId) && warrantySaleId.equals(saleId)) {
+            if (warranty.getProduct().getId().equals(productId) && buildSaleReference(warranty.getSale()).equals(saleId)) {
                 return warranty;
             }
         }
@@ -130,6 +141,79 @@ public class WarrantyService {
         }
 
         return expiringSoon;
+    }
+
+    /**
+     * Resolves a list of raw warranty records into real warranties,
+     * looking up each referenced product and sale. Records whose
+     * product or sale can no longer be found are skipped.
+     *
+     * @param records the raw records loaded from the repository
+     * @return the list of resolved warranties
+     */
+    private List<Warranty> resolveWarranties(List<WarrantyRecord> records) {
+        List<Warranty> resolved = new ArrayList<>();
+
+        for (WarrantyRecord record : records) {
+            Product product = findProductById(record.getProductId());
+            Sale sale = findSaleByReference(record.getSaleReference());
+
+            if (product == null || sale == null) {
+                continue;
+            }
+
+            Warranty warranty = record.getType().equals("BASIC")
+                    ? new BasicWarranty(record.getId(), product, sale, record.getStartDate())
+                    : new ExtendedWarranty(record.getId(), product, sale, record.getStartDate());
+
+            resolved.add(warranty);
+        }
+
+        return resolved;
+    }
+
+    /**
+     * Builds the pseudo-identifier used to identify a sale, composed of
+     * its date and its customer id, since {@link Sale} does not
+     * currently expose a unique identifier of its own.
+     *
+     * @param sale the sale to build the reference for
+     * @return the composite sale reference
+     */
+    private String buildSaleReference(Sale sale) {
+        return sale.getDate() + "|" + sale.getCustomer().getId();
+    }
+
+    /**
+     * Finds a product by its id among the products currently managed
+     * by {@link ProductService}.
+     *
+     * @param productId the id of the product to find
+     * @return the matching product, or null if not found
+     */
+    private Product findProductById(String productId) {
+        for (Product product : productService.listAllProducts()) {
+            if (product.getId().equals(productId)) {
+                return product;
+            }
+        }
+        return null;
+    }
+
+    /**
+     * Finds a sale whose composite reference matches the given value,
+     * among the sales currently managed by {@link SaleRepository}.
+     *
+     * @param saleReference the composite reference to match
+     * @return the matching sale, or null if not found
+     */
+    private Sale findSaleByReference(String saleReference) {
+        for (Sale sale : saleRepository.loadAll()) {
+            if (buildSaleReference(sale).equals(saleReference)) {
+                return sale;
+            }
+        }
+        return null;
     }
 
     /**
