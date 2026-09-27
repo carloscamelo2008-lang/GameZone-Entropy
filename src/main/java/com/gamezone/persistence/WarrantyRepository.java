@@ -6,7 +6,6 @@ import com.gamezone.model.Product;
 import com.gamezone.model.Sale;
 import com.gamezone.model.Warranty;
 import com.gamezone.service.ProductService;
-import com.gamezone.service.SaleService;
 
 import java.io.BufferedReader;
 import java.io.File;
@@ -25,16 +24,11 @@ import java.util.List;
  * business logic beyond resolving the Sale and Product references
  * needed to rebuild each warranty on load.
  *
- * Note: as specified in Requirement 4, this repository resolves Sale
- * references through {@link SaleService}. This introduces a circular
- * dependency (SaleService -&gt; WarrantyService -&gt; WarrantyRepository
- * -&gt; SaleService) that must be addressed separately by the
- * fix/warranty-circular-dependency integration adjustment.
  */
 public class WarrantyRepository {
 
     private final String filePath;
-    private final SaleService saleService;
+    private final SaleRepository saleRepository;
     private final ProductService productService;
 
     /**
@@ -42,12 +36,12 @@ public class WarrantyRepository {
      * resolving Sale and Product references through the given services.
      *
      * @param filePath       path to the CSV file used for persistence
-     * @param saleService    service used to resolve sale references on load
+     * @param saleRepository    repository used to resolve sale references on load
      * @param productService service used to resolve product references on load
      */
-    public WarrantyRepository(String filePath, SaleService saleService, ProductService productService) {
+    public WarrantyRepository(String filePath, SaleRepository saleRepository, ProductService productService) {
         this.filePath = filePath;
-        this.saleService = saleService;
+        this.saleRepository = saleRepository;
         this.productService = productService;
     }
 
@@ -179,14 +173,14 @@ public class WarrantyRepository {
 
     /**
      * Finds a sale by its date and its customer id among the sales
-     * currently managed by {@link SaleService}.
+     * currently managed by {@link SaleRepository}.
      *
      * @param date       the date and time of the sale
      * @param customerId the id of the customer who made the sale
      * @return the matching sale, or null if not found
      */
     private Sale findSale(LocalDateTime date, String customerId) {
-        for (Sale sale : saleService.listAllSales()) {
+        for (Sale sale : saleRepository.loadAll()) {
             if (sale.getDate().equals(date) && sale.getCustomer().getId().equals(customerId)) {
                 return sale;
             }
@@ -194,3 +188,4 @@ public class WarrantyRepository {
         return null;
     }
 }
+
