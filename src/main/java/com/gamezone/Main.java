@@ -7,6 +7,8 @@ import com.gamezone.service.PersonService;
 import com.gamezone.service.ProductService;
 import com.gamezone.service.SaleService;
 import com.gamezone.ui.UI;
+import com.gamezone.persistence.AccessoryRepository;
+import com.gamezone.service.AccessoryService;
 /**
  * Application entry point for the GameZone system.
  */
@@ -40,15 +42,28 @@ public class Main {
 
         ProductService productService =
                 new ProductService(productRepository);
+        AccessoryRepository accessoryRepository =
+                new AccessoryRepository(
+                        "data/accessories.csv"
+                );
+
+        AccessoryService accessoryService =
+                new AccessoryService(accessoryRepository);
+
 
         SaleService saleService =
                 new SaleService(
                         saleRepository,
                         productService,
+                        accessoryService,
                         personService
                 );
-
-        UI ui = new UI(personService, productService, saleService);
+        UI ui = new UI(
+                personService,
+                productService,
+                accessoryService,
+                saleService
+        );
         ui.start();
     }
 }
