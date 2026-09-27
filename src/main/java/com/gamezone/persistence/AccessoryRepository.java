@@ -110,7 +110,7 @@ public class AccessoryRepository {
         } else if (accessory instanceof Memory) {
             Memory memory = (Memory) accessory;
             type = "MEMORY";
-            field1 = String.valueOf(memory.getCapacityInGb());
+            field1 = String.valueOf(memory.getCapacityInGigabytes());
             field2 = memory.getMemoryType();
         } else {
             return null;

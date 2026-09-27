@@ -31,7 +31,7 @@ classDiagram
     }
 
     class Memory {
-        -int capacityInGb
+        -int capacityInGigabytes
         -String memoryType
         +getDescription() String
     }
