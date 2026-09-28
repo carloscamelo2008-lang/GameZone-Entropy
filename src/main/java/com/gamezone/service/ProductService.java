@@ -70,6 +70,21 @@ public class ProductService {
             }
         }
     }
+    /**
+     * Restores the stock of a product by the given quantity.
+     *
+     * @param id the id of the product to update
+     * @param quantity the quantity to add to stock
+     */
+    public void restoreStock(String id, int quantity) {
+        for (Product product : products) {
+            if (product.getId().equals(id)) {
+                product.setStock(product.getStock() + quantity);
+                repository.saveAll(products);
+                return;
+            }
+        }
+    }
 
     /**
      * Registers a new video game, adding it to the managed list and
