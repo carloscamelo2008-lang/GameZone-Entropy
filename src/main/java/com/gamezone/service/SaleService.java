@@ -155,6 +155,17 @@ public class SaleService {
 
         double extendedWarrantyCost = 0.0;
 
+        Map<String, Integer> extendedWarrantyQuantities = new HashMap<>();
+
+        if (productIdsWithExtendedWarranty != null) {
+            for (String productId : productIdsWithExtendedWarranty) {
+                extendedWarrantyQuantities.put(
+                        productId,
+                        extendedWarrantyQuantities.getOrDefault(productId, 0) + 1
+                );
+            }
+        }
+
         for (Product product : products) {
 
             if (product instanceof Console) {
@@ -165,8 +176,12 @@ public class SaleService {
                         sale.getDate().toLocalDate()
                 );
 
-                if (productIdsWithExtendedWarranty != null
-                        && productIdsWithExtendedWarranty.contains(product.getId())) {
+                int extendedQuantity = extendedWarrantyQuantities.getOrDefault(
+                        product.getId(),
+                        0
+                );
+
+                if (extendedQuantity > 0) {
 
                     ExtendedWarranty warranty =
                             warrantyService.assignExtendedWarranty(
@@ -176,6 +191,15 @@ public class SaleService {
                             );
 
                     extendedWarrantyCost += warranty.getAdditionalCost();
+
+                    if (extendedQuantity == 1) {
+                        extendedWarrantyQuantities.remove(product.getId());
+                    } else {
+                        extendedWarrantyQuantities.put(
+                                product.getId(),
+                                extendedQuantity - 1
+                        );
+                    }
                 }
             }
         }
