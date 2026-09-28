@@ -3,14 +3,17 @@ package com.gamezone;
 import com.gamezone.persistence.AccessoryRepository;
 import com.gamezone.persistence.PersonRepository;
 import com.gamezone.persistence.ProductRepository;
+import com.gamezone.persistence.PromotionRepository;
 import com.gamezone.persistence.SaleRepository;
 import com.gamezone.persistence.WarrantyRepository;
 import com.gamezone.service.AccessoryService;
 import com.gamezone.service.PersonService;
 import com.gamezone.service.ProductService;
+import com.gamezone.service.PromotionService;
 import com.gamezone.service.SaleService;
 import com.gamezone.service.WarrantyService;
 import com.gamezone.ui.UI;
+
 /**
  * Application entry point for the GameZone system.
  */
@@ -53,19 +56,12 @@ public class Main {
         AccessoryService accessoryService =
                 new AccessoryService(accessoryRepository);
 
-        SaleService saleService =
-                new SaleService(
-                        saleRepository,
-                        productService,
-                        accessoryService,
-                        personService
-                );
+        PromotionRepository promotionRepository =
+                new PromotionRepository("data/promotions.csv");
 
-        // WarrantyRepository has no dependency on SaleService or SaleRepository;
-        // it only persists and loads raw warranty records. WarrantyService is
-        // the one that resolves Sale and Product references, using
-        // SaleRepository and ProductService directly, which avoids the
-        // circular dependency described by integration adjustment A2.
+        PromotionService promotionService =
+                new PromotionService(promotionRepository);
+
         WarrantyRepository warrantyRepository =
                 new WarrantyRepository("data/warranties.csv");
 
@@ -76,6 +72,16 @@ public class Main {
                         productService
                 );
 
+        SaleService saleService =
+                new SaleService(
+                        saleRepository,
+                        productService,
+                        accessoryService,
+                        personService,
+                        promotionService,
+                        warrantyService
+                );
+
         // TODO: wire warrantyService into UI/ConsoleMenu once the warranty
         // management submenu is added (Líder Técnico, per Requirement 4).
         UI ui = new UI(
@@ -84,6 +90,7 @@ public class Main {
                 accessoryService,
                 saleService
         );
+
         ui.start();
     }
 }
