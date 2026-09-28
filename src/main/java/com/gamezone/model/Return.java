@@ -36,26 +36,56 @@ public class Return {
         this.refundAmount = calculateRefundAmount();
     }
 
+    /**
+     * Returns the unique identifier of the return.
+     *
+     * @return the return id
+     */
     public String getId() {
         return id;
     }
 
+    /**
+     * Returns the date the return was registered.
+     *
+     * @return the return date
+     */
     public LocalDate getDate() {
         return date;
     }
 
+    /**
+     * Returns the original sale this return references.
+     *
+     * @return the associated sale
+     */
     public Sale getSale() {
         return sale;
     }
 
+    /**
+     * Returns the specific products being returned.
+     *
+     * @return the list of returned products
+     */
     public List<Product> getReturnedProducts() {
         return returnedProducts;
     }
 
+    /**
+     * Returns the reason given for the return.
+     *
+     * @return the return reason
+     */
     public String getReason() {
         return reason;
     }
 
+    /**
+     * Returns the refund amount calculated for this return.
+     *
+     * @return the refund amount
+     */
     public double getRefundAmount() {
         return refundAmount;
     }
@@ -77,7 +107,8 @@ public class Return {
 
     /**
      * Builds a formatted receipt describing this return, in Spanish,
-     * for display to the end user.
+     * for display to the end user. The receipt includes a reference to
+     * the original sale (its date and customer).
      *
      * @return a human-readable return receipt
      */
@@ -86,6 +117,9 @@ public class Return {
         receipt.append("Recibo de Devolución\n");
         receipt.append("ID: ").append(id).append("\n");
         receipt.append("Fecha: ").append(date).append("\n");
+        receipt.append("Venta original: ").append(sale.getDate())
+                .append(" | Cliente: ").append(sale.getCustomer().getName())
+                .append(" (").append(sale.getCustomer().getId()).append(")\n");
         receipt.append("Productos devueltos:\n");
         for (Product product : returnedProducts) {
             receipt.append(" - ").append(product.getTitle())
