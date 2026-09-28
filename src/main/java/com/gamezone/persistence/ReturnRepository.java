@@ -3,6 +3,7 @@ package com.gamezone.persistence;
 import com.gamezone.model.Product;
 import com.gamezone.model.Return;
 import com.gamezone.model.Sale;
+import com.gamezone.service.AccessoryService;
 import com.gamezone.service.ProductService;
 
 import java.io.BufferedReader;
@@ -21,7 +22,8 @@ import java.util.List;
  * the return id, its date, a composite reference to the original sale, the
  * ids of the returned products and the reason (kept last so that it may
  * safely contain commas). Sale and Product references are resolved on load
- * through {@link SaleRepository} and {@link ProductService}.
+ * through {@link SaleRepository}, {@link ProductService} and
+ * {@link AccessoryService} (accessories are kept apart from products).
  */
 public class ReturnRepository {
 
@@ -30,6 +32,7 @@ public class ReturnRepository {
     private final String filePath;
     private final SaleRepository saleRepository;
     private final ProductService productService;
+    private final AccessoryService accessoryService;
 
     /**
      * Creates a return repository backed by the given CSV file.
@@ -37,11 +40,14 @@ public class ReturnRepository {
      * @param filePath        path to the CSV file used for persistence
      * @param saleRepository  repository used to resolve sale references on load
      * @param productService  service used to resolve product references on load
+     * @param accessoryService service used to resolve accessory references on load
      */
-    public ReturnRepository(String filePath, SaleRepository saleRepository, ProductService productService) {
+    public ReturnRepository(String filePath, SaleRepository saleRepository, ProductService productService,
+                            AccessoryService accessoryService) {
         this.filePath = filePath;
         this.saleRepository = saleRepository;
         this.productService = productService;
+        this.accessoryService = accessoryService;
     }
 
     /**
@@ -185,7 +191,8 @@ public class ReturnRepository {
 
     /**
      * Finds a product by its id among the products managed by
-     * {@link ProductService}.
+     * {@link ProductService} and, when it is not there, among the accessories
+     * managed by {@link AccessoryService}.
      *
      * @param productId the id of the product to find
      * @return the matching product, or null if not found
@@ -196,6 +203,6 @@ public class ReturnRepository {
                 return product;
             }
         }
-        return null;
+        return accessoryService.findById(productId);
     }
 }
