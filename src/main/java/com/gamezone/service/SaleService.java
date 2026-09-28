@@ -13,6 +13,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 import com.gamezone.model.Accessory;
+import com.gamezone.model.Promotion;
 /**
  * Contains the business rules related to sales.
  */
@@ -22,6 +23,7 @@ public class SaleService {
     private final ProductService productService;
     private final PersonService personService;
     private final AccessoryService accessoryService;
+    private final PromotionService promotionService;
     private final List<Sale> sales;
     /**
      * Creates a sale service and loads previously stored sales.
@@ -30,17 +32,20 @@ public class SaleService {
      * @param productService service used to access and update products
      * @param accessoryService service used to access and update accessories
      * @param personService service used to find customers and sellers
+     * @param promotionService service used to find the best promotion
      */
     public SaleService(
             SaleRepository saleRepository,
             ProductService productService,
             AccessoryService accessoryService,
-            PersonService personService) {
+            PersonService personService,
+            PromotionService promotionService) {
 
         this.saleRepository = saleRepository;
         this.productService = productService;
         this.accessoryService = accessoryService;
         this.personService = personService;
+        this.promotionService = promotionService;
 
         this.sales = saleRepository.loadAll();
     }
@@ -58,6 +63,13 @@ public class SaleService {
      */
     public Sale registerSale(String customerId, String sellerId, List<String> productIds) {
 
+
+        if (productIds == null || productIds.isEmpty()) {
+            throw new IllegalArgumentException(
+                    "A sale must contain at least one product."
+            );
+        }
+
         Customer customer = personService.findCustomerById(customerId);
         if (customer == null) {
             throw new IllegalArgumentException("Customer not found.");
@@ -68,11 +80,7 @@ public class SaleService {
             throw new IllegalArgumentException("Seller not found.");
         }
 
-        if (productIds == null || productIds.isEmpty()) {
-            throw new IllegalArgumentException(
-                    "A sale must contain at least one product."
-            );
-        }
+
 
         Map<String, Integer> quantities = new HashMap<>();
 
@@ -121,6 +129,21 @@ public class SaleService {
             }
         }
 
+        Sale sale = new Sale(
+                LocalDateTime.now(),
+                customer,
+                seller,
+                products
+        );
+
+        Promotion promotion = promotionService.findBestPromotionFor(sale);
+
+        if (promotion != null) {
+            double discount = promotion.calculateDiscount(sale);
+            sale.setAppliedPromotionName(promotion.getName());
+            sale.setDiscountAmount(discount);
+        }
+
         for (Map.Entry<String, Integer> entry : quantities.entrySet()) {
 
             String itemId = entry.getKey();
@@ -135,17 +158,12 @@ public class SaleService {
             }
         }
 
-        Sale sale = new Sale(
-                LocalDateTime.now(),
-                customer,
-                seller,
-                products
-        );
-
         sales.add(sale);
         saleRepository.saveAll(sales);
 
         return sale;
+
+
     }
     /**
      * Finds a product or accessory by its id.

@@ -11,6 +11,8 @@ import com.gamezone.service.ProductService;
 import com.gamezone.service.SaleService;
 import com.gamezone.service.WarrantyService;
 import com.gamezone.ui.UI;
+import com.gamezone.persistence.PromotionRepository;
+import com.gamezone.service.PromotionService;
 /**
  * Application entry point for the GameZone system.
  */
@@ -52,13 +54,18 @@ public class Main {
 
         AccessoryService accessoryService =
                 new AccessoryService(accessoryRepository);
+        PromotionRepository promotionRepository =
+                new PromotionRepository("data/promotions.csv");
 
+        PromotionService promotionService =
+                new PromotionService(promotionRepository);
         SaleService saleService =
                 new SaleService(
                         saleRepository,
                         productService,
                         accessoryService,
-                        personService
+                        personService,
+                        promotionService
                 );
 
         // WarrantyRepository has no dependency on SaleService or SaleRepository;
