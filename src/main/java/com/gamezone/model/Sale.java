@@ -18,6 +18,7 @@ public class Sale implements Serializable {
     private List<Product> products;
     private String appliedPromotionName;
     private double discountAmount;
+    private double extendedWarrantyCost;
 
     /**
      * Creates a new sale.
@@ -34,6 +35,7 @@ public class Sale implements Serializable {
         this.products = products;
         this.appliedPromotionName = null;
         this.discountAmount = 0.0;
+        this.extendedWarrantyCost = 0.0;
     }
 
     /**
@@ -109,7 +111,25 @@ public class Sale implements Serializable {
     }
 
     /**
-     * Calculates the subtotal of the sale before discounts.
+     * Returns the additional cost of extended warranties.
+     *
+     * @return the extended warranty cost
+     */
+    public double getExtendedWarrantyCost() {
+        return extendedWarrantyCost;
+    }
+
+    /**
+     * Updates the additional cost of extended warranties.
+     *
+     * @param extendedWarrantyCost the extended warranty cost
+     */
+    public void setExtendedWarrantyCost(double extendedWarrantyCost) {
+        this.extendedWarrantyCost = extendedWarrantyCost;
+    }
+
+    /**
+     * Calculates the subtotal of the sale before discounts and warranties.
      *
      * @return the subtotal of all products
      */
@@ -124,18 +144,20 @@ public class Sale implements Serializable {
     }
 
     /**
-     * Calculates the final total after applying the sale discount.
+     * Calculates the final total after applying the discount
+     * and adding the extended warranty cost.
      *
      * @return the final total of the sale
      */
     public double calculateFinalTotal() {
-        return calculateTotal() - discountAmount;
+        return calculateTotal() - discountAmount + extendedWarrantyCost;
     }
 
     /**
      * Generates a formatted receipt for the sale.
      *
-     * @return the sale receipt with subtotal, discount and final total
+     * @return the sale receipt with subtotal, discount,
+     *         extended warranty cost and final total
      */
     public String generateReceipt() {
         String promotion = appliedPromotionName == null
@@ -145,6 +167,7 @@ public class Sale implements Serializable {
         return "===== RECIBO DE VENTA =====\n"
                 + "Subtotal: $" + calculateTotal() + "\n"
                 + "Descuento (" + promotion + "): -$" + discountAmount + "\n"
+                + "Garantías extendidas: +$" + extendedWarrantyCost + "\n"
                 + "Total final: $" + calculateFinalTotal();
     }
 }
