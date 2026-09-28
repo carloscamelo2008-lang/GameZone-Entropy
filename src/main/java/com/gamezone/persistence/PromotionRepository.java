@@ -7,6 +7,7 @@ import com.gamezone.model.Promotion;
 
 import java.io.*;
 import java.time.LocalDate;
+import java.time.format.DateTimeParseException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -14,7 +15,9 @@ import java.util.List;
  * Handles persistence of promotions to and from a plain-text CSV
  * file. Each line stores a discriminator (PERCENTAGE, CATEGORY or
  * BULK) followed by the common fields and the type-specific fields,
- * so the concrete subtype can be reconstructed when loading. This
+ * so the concrete subtype can be reconstructed when loading. Text
+ * fields containing commas or quotes are wrapped in double quotes,
+ * with inner quotes doubled, so they can be loaded back safely. This
  * class is responsible only for reading and writing data; it
  * contains no business logic.
  */
@@ -88,6 +91,7 @@ public class PromotionRepository {
     /**
      * Converts a promotion into a single CSV line, using a type
      * discriminator so the correct subclass can be rebuilt on load.
+     * Text fields are escaped so commas and quotes are preserved.
      *
      * @param promotion the promotion to convert
      * @return the CSV line, or null if the promotion type is unknown
@@ -118,12 +122,12 @@ public class PromotionRepository {
 
         return String.join(DELIMITER,
                 type,
-                promotion.getId(),
-                promotion.getName(),
+                escapeField(promotion.getId()),
+                escapeField(promotion.getName()),
                 promotion.getStartDate().toString(),
                 promotion.getEndDate().toString(),
                 field1,
-                field2);
+                escapeField(field2));
     }
 
     /**
@@ -135,29 +139,92 @@ public class PromotionRepository {
      *         malformed or the discriminator is unknown
      */
     private Promotion fromCsvLine(String line) {
-        String[] fields = line.split(DELIMITER, -1);
-        if (fields.length < 7) {
+        List<String> fields = splitCsvLine(line);
+        if (fields.size() < 7) {
             return null;
         }
 
-        String type = fields[0];
-        String id = fields[1];
-        String name = fields[2];
-        LocalDate startDate = LocalDate.parse(fields[3]);
-        LocalDate endDate = LocalDate.parse(fields[4]);
-        String field1 = fields[5];
-        String field2 = fields[6];
+        String type = fields.get(0);
+        String id = fields.get(1);
+        String name = fields.get(2);
+        String field1 = fields.get(5);
+        String field2 = fields.get(6);
 
-        switch (type) {
-            case "PERCENTAGE":
-                return new PercentageDiscount(id, name, startDate, endDate, Double.parseDouble(field1));
-            case "CATEGORY":
-                return new CategoryDiscount(id, name, startDate, endDate, Double.parseDouble(field1), field2);
-            case "BULK":
-                return new BulkPurchaseDiscount(id, name, startDate, endDate,
-                        Integer.parseInt(field1), Double.parseDouble(field2));
-            default:
-                return null;
+        try {
+            LocalDate startDate = LocalDate.parse(fields.get(3));
+            LocalDate endDate = LocalDate.parse(fields.get(4));
+
+            switch (type) {
+                case "PERCENTAGE":
+                    return new PercentageDiscount(id, name, startDate, endDate, Double.parseDouble(field1));
+                case "CATEGORY":
+                    return new CategoryDiscount(id, name, startDate, endDate, Double.parseDouble(field1), field2);
+                case "BULK":
+                    return new BulkPurchaseDiscount(id, name, startDate, endDate,
+                            Integer.parseInt(field1), Double.parseDouble(field2));
+                default:
+                    return null;
+            }
+        } catch (DateTimeParseException | NumberFormatException e) {
+            return null;
         }
+    }
+
+    /**
+     * Escapes a value so it can be stored safely in a CSV field.
+     * Values containing the delimiter or quotes are wrapped in double
+     * quotes, and inner quotes are doubled. Line breaks are replaced
+     * by spaces so each promotion stays on a single line.
+     *
+     * @param value the raw field value
+     * @return the escaped field value
+     */
+    private String escapeField(String value) {
+        if (value == null) {
+            return "";
+        }
+        String clean = value.replace("\r", " ").replace("\n", " ");
+        if (clean.contains(DELIMITER) || clean.contains("\"")) {
+            return "\"" + clean.replace("\"", "\"\"") + "\"";
+        }
+        return clean;
+    }
+
+    /**
+     * Splits a CSV line into fields, honoring double-quoted fields that
+     * may contain the delimiter and doubled quotes.
+     *
+     * @param line the CSV line to split
+     * @return the list of unescaped field values
+     */
+    private List<String> splitCsvLine(String line) {
+        List<String> fields = new ArrayList<>();
+        StringBuilder current = new StringBuilder();
+        boolean inQuotes = false;
+
+        for (int i = 0; i < line.length(); i++) {
+            char c = line.charAt(i);
+            if (inQuotes) {
+                if (c == '"') {
+                    if (i + 1 < line.length() && line.charAt(i + 1) == '"') {
+                        current.append('"');
+                        i++;
+                    } else {
+                        inQuotes = false;
+                    }
+                } else {
+                    current.append(c);
+                }
+            } else if (c == '"') {
+                inQuotes = true;
+            } else if (c == DELIMITER.charAt(0)) {
+                fields.add(current.toString());
+                current.setLength(0);
+            } else {
+                current.append(c);
+            }
+        }
+        fields.add(current.toString());
+        return fields;
     }
 }
