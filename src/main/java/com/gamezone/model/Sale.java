@@ -11,10 +11,13 @@ import java.util.List;
  */
 public class Sale implements Serializable {
     private static final long serialVersionUID = 1L;
+
     private LocalDateTime date;
     private Customer customer;
     private Seller seller;
     private List<Product> products;
+    private String appliedPromotionName;
+    private double discountAmount;
 
     /**
      * Creates a new sale.
@@ -29,6 +32,8 @@ public class Sale implements Serializable {
         this.customer = customer;
         this.seller = seller;
         this.products = products;
+        this.appliedPromotionName = null;
+        this.discountAmount = 0.0;
     }
 
     /**
@@ -68,9 +73,45 @@ public class Sale implements Serializable {
     }
 
     /**
-     * Calculates the total value of the sale.
+     * Returns the name of the promotion applied to the sale.
      *
-     * @return the total price of all products
+     * @return the applied promotion name, or null if no promotion was applied
+     */
+    public String getAppliedPromotionName() {
+        return appliedPromotionName;
+    }
+
+    /**
+     * Updates the name of the promotion applied to the sale.
+     *
+     * @param appliedPromotionName the applied promotion name
+     */
+    public void setAppliedPromotionName(String appliedPromotionName) {
+        this.appliedPromotionName = appliedPromotionName;
+    }
+
+    /**
+     * Returns the monetary discount applied to the sale.
+     *
+     * @return the discount amount
+     */
+    public double getDiscountAmount() {
+        return discountAmount;
+    }
+
+    /**
+     * Updates the monetary discount applied to the sale.
+     *
+     * @param discountAmount the discount amount
+     */
+    public void setDiscountAmount(double discountAmount) {
+        this.discountAmount = discountAmount;
+    }
+
+    /**
+     * Calculates the subtotal of the sale before discounts.
+     *
+     * @return the subtotal of all products
      */
     public double calculateTotal() {
         double total = 0;
@@ -80,5 +121,30 @@ public class Sale implements Serializable {
         }
 
         return total;
+    }
+
+    /**
+     * Calculates the final total after applying the sale discount.
+     *
+     * @return the final total of the sale
+     */
+    public double calculateFinalTotal() {
+        return calculateTotal() - discountAmount;
+    }
+
+    /**
+     * Generates a formatted receipt for the sale.
+     *
+     * @return the sale receipt with subtotal, discount and final total
+     */
+    public String generateReceipt() {
+        String promotion = appliedPromotionName == null
+                ? "Sin promoción"
+                : appliedPromotionName;
+
+        return "===== RECIBO DE VENTA =====\n"
+                + "Subtotal: $" + calculateTotal() + "\n"
+                + "Descuento (" + promotion + "): -$" + discountAmount + "\n"
+                + "Total final: $" + calculateFinalTotal();
     }
 }
