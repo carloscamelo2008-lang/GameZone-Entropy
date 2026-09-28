@@ -59,7 +59,7 @@ public class PromotionService {
      * @param startDate      the date the promotion becomes active
      * @param endDate        the date the promotion stops being active
      * @param percentage     the discount percentage (between 0 and 100)
-     * @param targetCategory the target category ("VIDEOGAME" or "CONSOLE")
+     * @param targetCategory the target category ("VIDEOGAME", "CONSOLE" or "ACCESSORY")
      * @return the newly registered promotion
      */
     public CategoryDiscount registerCategoryDiscount(String id, String name, LocalDate startDate,
