@@ -170,4 +170,16 @@ public class Sale implements Serializable {
                 + "Garantías extendidas: +$" + extendedWarrantyCost + "\n"
                 + "Total final: $" + calculateFinalTotal();
     }
+    /**
+     * Checks whether the sale is eligible for a return. A sale is eligible
+     * only if it was made between 0 and 30 days ago; sales with a future
+     * date are not eligible.
+     *
+     * @return true if the sale is between 0 and 30 days old
+     */
+    public boolean canBeReturned() {
+        long daysSinceSale = java.time.temporal.ChronoUnit.DAYS.between(
+                getDate().toLocalDate(), java.time.LocalDate.now());
+        return daysSinceSale >= 0 && daysSinceSale <= 30;
+    }
 }
