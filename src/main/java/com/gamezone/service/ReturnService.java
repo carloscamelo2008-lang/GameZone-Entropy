@@ -1,5 +1,6 @@
 package com.gamezone.service;
 
+import com.gamezone.model.Accessory;
 import com.gamezone.model.Product;
 import com.gamezone.model.Return;
 import com.gamezone.model.Sale;
@@ -22,6 +23,7 @@ public class ReturnService {
     private final ReturnRepository returnRepository;
     private final SaleService saleService;
     private final ProductService productService;
+    private final AccessoryService accessoryService;
     private final List<Return> returns;
 
     /**
@@ -30,11 +32,14 @@ public class ReturnService {
      * @param returnRepository repository used to persist returns
      * @param saleService      service used to find the original sales
      * @param productService   service used to restore product stock
+     * @param accessoryService service used to restore accessory stock
      */
-    public ReturnService(ReturnRepository returnRepository, SaleService saleService, ProductService productService) {
+    public ReturnService(ReturnRepository returnRepository, SaleService saleService, ProductService productService,
+            AccessoryService accessoryService) {
         this.returnRepository = returnRepository;
         this.saleService = saleService;
         this.productService = productService;
+        this.accessoryService = accessoryService;
         this.returns = returnRepository.loadAll();
     }
 
@@ -105,7 +110,7 @@ public class ReturnService {
         );
 
         for (Map.Entry<String, Integer> entry : requested.entrySet()) {
-            productService.restoreStock(entry.getKey(), entry.getValue());
+            restoreItemStock(findProductInSale(sale, entry.getKey()), entry.getValue());
         }
 
         returns.add(newReturn);
@@ -288,5 +293,20 @@ public class ReturnService {
         }
 
         return counts;
+    }
+
+    /**
+     * Restores the stock of a returned item: accessories through
+     * {@link AccessoryService}, any other product through {@link ProductService}.
+     *
+     * @param item     the returned item
+     * @param quantity the number of units to put back in stock
+     */
+    private void restoreItemStock(Product item, int quantity) {
+        if (item instanceof Accessory) {
+            accessoryService.updateStock(item.getId(), quantity);
+        } else {
+            productService.restoreStock(item.getId(), quantity);
+        }
     }
 }
