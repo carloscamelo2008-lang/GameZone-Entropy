@@ -4,6 +4,7 @@ import com.gamezone.service.PersonService;
 import com.gamezone.service.ProductService;
 import com.gamezone.service.SaleService;
 import com.gamezone.model.Product;
+import com.gamezone.model.Console;
 import com.gamezone.model.Sale;
 import java.util.List;
 import java.util.Scanner;
@@ -290,7 +291,8 @@ public class UI {
         }
     }
     /**
-     * Registers a new sale using customer, seller, and selected products.
+     * Registers a new sale using customer, seller, selected products,
+     * and optional extended warranties for consoles.
      */
     private void registerSale() {
         System.out.println("\n===== REGISTRAR VENTA =====");
@@ -302,6 +304,7 @@ public class UI {
         String sellerId = scanner.nextLine();
 
         List<String> productIds = new java.util.ArrayList<>();
+        List<String> productIdsWithExtendedWarranty = new java.util.ArrayList<>();
 
         System.out.println("\nIngrese los productos de la venta.");
         System.out.println("Escriba FIN cuando haya terminado.");
@@ -327,21 +330,52 @@ public class UI {
             return;
         }
 
+        for (String productId : productIds) {
+
+            Product product = null;
+
+            for (Product availableProduct : productService.listAllProducts()) {
+                if (availableProduct.getId().equals(productId)) {
+                    product = availableProduct;
+                    break;
+                }
+            }
+
+            if (product instanceof Console) {
+
+                System.out.print(
+                        "¿Desea garantía extendida para la consola "
+                                + product.getTitle() + "? (s/n): "
+                );
+
+                String answer = scanner.nextLine();
+
+                if (answer.equalsIgnoreCase("s")) {
+                    productIdsWithExtendedWarranty.add(productId);
+                }
+            }
+        }
+
         try {
             Sale sale = saleService.registerSale(
                     customerId,
                     sellerId,
-                    productIds
+                    productIds,
+                    productIdsWithExtendedWarranty
             );
 
             System.out.println("Venta registrada correctamente.");
             System.out.println("Fecha: " + sale.getDate());
             System.out.println("Cliente: " + sale.getCustomer().getName());
             System.out.println("Vendedor: " + sale.getSeller().getName());
-            System.out.println("Total: $" + sale.calculateTotal());
+
+            System.out.println();
+            System.out.println(sale.generateReceipt());
 
         } catch (Exception e) {
-            System.out.println("Error al registrar la venta: " + e.getMessage());
+            System.out.println(
+                    "Error al registrar la venta: " + e.getMessage()
+            );
         }
     }
     /**
