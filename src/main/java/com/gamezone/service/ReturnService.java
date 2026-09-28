@@ -304,7 +304,7 @@ public class ReturnService {
      */
     private void restoreItemStock(Product item, int quantity) {
         if (item instanceof Accessory) {
-            accessoryService.updateStock(item.getId(), quantity);
+            accessoryService.restoreStock(item.getId(), quantity);
         } else {
             productService.restoreStock(item.getId(), quantity);
         }

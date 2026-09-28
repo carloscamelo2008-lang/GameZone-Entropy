@@ -180,4 +180,15 @@ public class AccessoryService {
             accessoryRepository.saveAll(accessories);
         }
     }
+
+    /**
+     * Restores the stock of an accessory after a return, adding the returned
+     * quantity to its current stock.
+     *
+     * @param accessoryId the id of the accessory
+     * @param quantity    the number of returned units
+     */
+    public void restoreStock(String accessoryId, int quantity) {
+        updateStock(accessoryId, quantity);
+    }
 }
