@@ -144,6 +144,39 @@ public class WarrantyService {
     }
 
     /**
+     * Cancels the warranties associated to a specific product within a
+     * specific sale, removing them so a returned console does not keep
+     * an active warranty. Both a basic and an extended warranty may
+     * exist for the same product and sale; both are removed if present.
+     *
+     * @param productId the id of the returned product
+     * @param saleId    the composite identifier of the sale, built with
+     *                  {@code sale.getDate() + "|" + sale.getCustomer().getId()}
+     * @return the total refundable cost of the cancelled warranties
+     *         (zero for a basic warranty, the additional cost for an
+     *         extended one), or zero if no warranty was found
+     */
+    public double cancelWarranties(String productId, String saleId) {
+        double refundableAmount = 0;
+        List<Warranty> toRemove = new ArrayList<>();
+
+        for (Warranty warranty : warranties) {
+            if (warranty.getProduct().getId().equals(productId)
+                    && buildSaleReference(warranty.getSale()).equals(saleId)) {
+                refundableAmount += warranty.getAdditionalCost();
+                toRemove.add(warranty);
+            }
+        }
+
+        if (!toRemove.isEmpty()) {
+            warranties.removeAll(toRemove);
+            warrantyRepository.saveAll(warranties);
+        }
+
+        return refundableAmount;
+    }
+
+    /**
      * Resolves a list of raw warranty records into real warranties,
      * looking up each referenced product and sale. Records whose
      * product or sale can no longer be found are skipped.

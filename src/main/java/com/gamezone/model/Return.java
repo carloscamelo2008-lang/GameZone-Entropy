@@ -17,6 +17,7 @@ public class Return {
     private List<Product> returnedProducts;
     private String reason;
     private double refundAmount;
+    private double warrantyRefundAmount;
 
     /**
      * Creates a new return record and calculates its refund amount.
@@ -91,6 +92,28 @@ public class Return {
     }
 
     /**
+     * Adds a refundable amount coming from warranties cancelled together
+     * with this return (for example, the extended warranty cost of a
+     * returned console), and updates the total refund amount accordingly.
+     *
+     * @param amount the additional amount to refund
+     */
+    public void addWarrantyRefund(double amount) {
+        this.warrantyRefundAmount += amount;
+        this.refundAmount += amount;
+    }
+
+    /**
+     * Returns the total amount reimbursed for cancelled warranties
+     * associated with this return.
+     *
+     * @return the warranty refund amount
+     */
+    public double getWarrantyRefundAmount() {
+        return warrantyRefundAmount;
+    }
+
+    /**
      * Calculates the refund amount by summing the prices of the returned
      * products, reduced by the same discount rate that was applied to the
      * original sale, and stores it in this return's attribute.
@@ -151,6 +174,10 @@ public class Return {
                     .append(" | Descuento: -$").append(String.format("%.2f", discount))
                     .append(" | Reembolso: $").append(String.format("%.2f", price - discount))
                     .append("\n");
+        }
+        if (warrantyRefundAmount > 0) {
+            receipt.append("Reembolso por garant?as canceladas: $")
+                    .append(String.format("%.2f", warrantyRefundAmount)).append("\n");
         }
         receipt.append("Motivo: ").append(reason).append("\n");
         receipt.append("Total reembolsado: $")
