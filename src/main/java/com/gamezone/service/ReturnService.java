@@ -165,15 +165,16 @@ public class ReturnService {
     }
 
     /**
-     * Calculates the net balance of a month: the total of the sales made in
-     * that month minus the total refunded by the returns registered in it.
+     * Calculates the total of the sales made in a given month, using the
+     * final total of each sale (subtotal, minus any promotion discount,
+     * plus the cost of extended warranties).
      *
      * @param month the month (1-12)
      * @param year  the year
-     * @return the net balance (sales minus returns)
+     * @return the total sales for the given month and year
      * @throws IllegalArgumentException if the month is not between 1 and 12
      */
-    public double generateMonthlyBalance(int month, int year) {
+    public double calculateMonthlySales(int month, int year) {
         if (month < 1 || month > 12) {
             throw new IllegalArgumentException("El mes debe estar entre 1 y 12.");
         }
@@ -181,8 +182,25 @@ public class ReturnService {
         double totalSales = 0;
         for (Sale sale : saleService.listAllSales()) {
             if (sale.getDate().getMonthValue() == month && sale.getDate().getYear() == year) {
-                totalSales += sale.calculateTotal();
+                totalSales += sale.calculateFinalTotal();
             }
+        }
+
+        return totalSales;
+    }
+
+    /**
+     * Calculates the total amount refunded by the returns registered in a
+     * given month.
+     *
+     * @param month the month (1-12)
+     * @param year  the year
+     * @return the total returns for the given month and year
+     * @throws IllegalArgumentException if the month is not between 1 and 12
+     */
+    public double calculateMonthlyReturns(int month, int year) {
+        if (month < 1 || month > 12) {
+            throw new IllegalArgumentException("El mes debe estar entre 1 y 12.");
         }
 
         double totalReturns = 0;
@@ -192,7 +210,20 @@ public class ReturnService {
             }
         }
 
-        return totalSales - totalReturns;
+        return totalReturns;
+    }
+
+    /**
+     * Calculates the net balance of a month: the total of the sales made in
+     * that month minus the total refunded by the returns registered in it.
+     *
+     * @param month the month (1-12)
+     * @param year  the year
+     * @return the net balance (sales minus returns)
+     * @throws IllegalArgumentException if the month is not between 1 and 12
+     */
+    public double generateMonthlyBalance(int month, int year) {
+        return calculateMonthlySales(month, year) - calculateMonthlyReturns(month, year);
     }
 
     /**
