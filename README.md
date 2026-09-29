@@ -1,44 +1,178 @@
 # GameZone-Entropy
 
-Sistema de administración para GameZone, desarrollado en Java mediante programación orientada a objetos y una arquitectura organizada por capas.
+Integrated administration system for GameZone Unicesar, developed in Java with a layered architecture and a modular design for products, accessories, promotions, warranties, sales, and returns.
 
-## Equipo
+## Team
 
-| **Integrante**                | **Rol**          |
-| ----------------------------- | ---------------- |
-| Carlos Eduardo Camelo Montaño | Líder Técnico    |
-| Jesús Daniel Díaz Álvarez     | Desarrollador 1  |
-| Daniel Josué Arrieta Fontalvo | Desarrollador 2  |
+| Integrant | Role |
+| --- | --- |
+| Carlos Eduardo Camelo Montaño | Technical Leader |
+| Jesús Daniel Díaz Álvarez | Developer 1 |
+| Daniel Josué Arrieta Fontalvo | Developer 2 |
 
-## Descripción
+## System Overview
 
-GameZone es un sistema de administración para una tienda de videojuegos. Permite gestionar productos, clientes, vendedores e información relacionada con las ventas.
+GameZone is an administration system for a video game store. The integrated version combines the functionality developed in the previous requirements into a single system.
 
-El sistema permite registrar videojuegos y consolas, consultar el inventario, registrar clientes, consultar clientes y vendedores, registrar ventas y consultar diferentes historiales de ventas.
+The integrated domain includes:
 
-La aplicación también administra el inventario, validando la disponibilidad de los productos antes de registrar una venta y reduciendo automáticamente el stock correspondiente.
+- Video games
+- Consoles
+- Accessories
+- Customers
+- Sellers
+- Promotions
+- Basic warranties
+- Extended warranties
+- Sales
+- Returns
+- Monthly balance reporting
 
-## Tecnologías
+A sale can contain video games, consoles, and accessories in the same transaction.
 
-- Java 17
-- Maven
-- IntelliJ IDEA
-- Git
-- GitHub
-- Mermaid
+The integrated services coordinate promotions, warranties, inventory, and returns while preserving the separation between the model, service, persistence, and user interface layers.
 
-## Arquitectura
+## Integrated Functionalities
 
-El sistema está organizado en cuatro capas:
+### Product Management
 
-1. **Model**: contiene las clases que representan las entidades y conceptos principales del dominio.
-2. **Persistence**: contiene las clases responsables de guardar y recuperar información mediante archivos.
-3. **Service**: contiene la lógica y las reglas de negocio del sistema.
-4. **UI**: contiene la interfaz de usuario mediante consola.
+The system supports:
 
-La clase `Main` se encuentra en el paquete raíz `com.gamezone` y se encarga de inicializar los repositorios, servicios e interfaz de usuario.
+1. Registering video games.
+2. Registering consoles.
+3. Listing products.
+4. Managing product stock.
 
-Las dependencias entre capas siguen el siguiente flujo:
+### Accessory Management
+
+The system supports:
+
+1. Registering controllers.
+2. Registering cables.
+3. Registering memory cards.
+4. Listing accessories by type.
+5. Finding accessories compatible with a console.
+6. Updating accessory stock.
+7. Restoring accessory stock after a return.
+
+All accessories extend the common `Product` hierarchy.
+
+### People Management
+
+The system supports:
+
+1. Registering customers.
+2. Listing customers.
+3. Listing sellers.
+4. Finding customers by id.
+5. Finding sellers by id.
+
+### Promotions
+
+The system supports three promotion types:
+
+- Percentage discounts.
+- Category discounts.
+- Bulk-purchase discounts.
+
+Category discounts support:
+
+- `VIDEOGAME`
+- `CONSOLE`
+- `ACCESSORY`
+
+`PromotionService.findBestPromotionFor(...)` selects the active promotion that provides the largest monetary discount for a sale.
+
+### Sales
+
+The integrated sale flow supports:
+
+1. Validating the customer and seller.
+2. Validating that the sale contains at least one item.
+3. Resolving video games, consoles, and accessories.
+4. Validating stock according to the item type.
+5. Calculating the sale subtotal.
+6. Selecting the best applicable promotion.
+7. Applying the promotion discount to the sale subtotal.
+8. Assigning an automatic basic warranty to each console.
+9. Assigning optional extended warranties to consoles.
+10. Calculating the final sale total.
+11. Updating the corresponding inventory.
+12. Persisting the sale.
+
+The final sale total is calculated as:
+
+`subtotal - discount + extended warranty cost`
+
+The sale receipt includes:
+
+- Subtotal.
+- Applied promotion.
+- Discount amount.
+- Extended warranty cost.
+- Final total.
+
+### Warranties
+
+The warranty module supports:
+
+- Automatic basic warranties for consoles.
+- Optional extended warranties.
+- Warranty validity queries.
+- Upcoming warranty expiration queries.
+- Warranty lookup by product and sale.
+- Cancellation of warranties when a console is returned.
+
+The extended warranty cost is calculated as 10% of the covered product price.
+
+The warranty repository stores warranty identifiers and uses the service layer to resolve the corresponding sales and products. This prevents the circular dependency addressed during integration.
+
+### Returns
+
+The integrated return module supports:
+
+1. Registering partial returns.
+2. Validating that the original sale exists.
+3. Validating the 30-day return period.
+4. Validating that returned items belong to the original sale.
+5. Preventing the same unit from being returned more than once.
+6. Restoring product stock.
+7. Restoring accessory stock.
+8. Calculating proportional refunds for discounted sales.
+9. Cancelling warranties associated with returned consoles.
+10. Including refundable extended warranty costs in the return.
+11. Generating a detailed return receipt.
+
+The proportional refund for a returned item is calculated as:
+
+`price × (1 - discount / subtotal)`
+
+The return receipt displays the original price, proportional discount, refunded amount, and warranty refund when applicable.
+
+### Monthly Balance
+
+The return service provides:
+
+- `calculateMonthlySales(int month, int year)`
+- `calculateMonthlyReturns(int month, int year)`
+- `generateMonthlyBalance(int month, int year)`
+
+Monthly sales use each sale's final total, including promotions and extended warranties.
+
+The monthly net balance is calculated as:
+
+`monthly sales - monthly returns`
+
+## Architecture
+
+The application is organized into four layers:
+
+1. **Model**: domain entities and business concepts.
+2. **Persistence**: repositories responsible for reading and writing data.
+3. **Service**: business logic and coordination between modules.
+4. **UI**: console-based user interface.
+
+The main dependency direction is:
 
 ```text
 UI → Service → Persistence
@@ -46,9 +180,87 @@ UI → Service → Persistence
       Model
 ```
 
-La interfaz de usuario utiliza los servicios para realizar las operaciones del sistema. Los servicios contienen las reglas de negocio y utilizan las clases de persistencia para guardar y recuperar información. Las clases del dominio pertenecen a la capa `Model`.
+Services may coordinate other services when cross-module business rules require it.
 
-## Estructura del proyecto
+## Main Integrated Services
+
+### ProductService
+
+Manages:
+
+- Products.
+- Stock validation.
+- Stock reduction.
+- Stock restoration.
+- Product registration.
+
+### AccessoryService
+
+Manages:
+
+- Accessory registration.
+- Accessory queries.
+- Compatibility queries.
+- Accessory stock updates.
+- Accessory stock restoration.
+
+### PromotionService
+
+Manages:
+
+- Promotion registration.
+- Active promotions.
+- Best-promotion selection.
+
+### WarrantyService
+
+Manages:
+
+- Basic warranties.
+- Extended warranties.
+- Warranty queries.
+- Warranty cancellation during returns.
+
+### SaleService
+
+Coordinates:
+
+- People.
+- Products.
+- Accessories.
+- Promotions.
+- Warranties.
+- Sales persistence.
+
+### ReturnService
+
+Coordinates:
+
+- Return validation.
+- Product stock restoration.
+- Accessory stock restoration.
+- Proportional refunds.
+- Warranty cancellation.
+- Monthly reporting.
+
+## Persistence
+
+The system uses file-based persistence.
+
+Examples include:
+
+- `data/products.dat`
+- `data/sales.dat`
+- `data/customers.csv`
+- `data/sellers.csv`
+- `data/accessories.csv`
+- `data/promotions.csv`
+- `data/warranties.csv`
+- `data/returns.csv`
+
+Repositories are responsible for file access and serialization.
+
+## Project Structure
 
 ```text
 src/main/java/com/gamezone/
@@ -57,87 +269,55 @@ src/main/java/com/gamezone/
 ├── service/
 ├── ui/
 └── Main.java
+
+docs/
+├── accessory-analysis.md
+├── accessory-class-diagram.md
+├── integration-analysis.md
+├── integrated-class-diagram.md
+├── layers-diagram.md
+├── warranty-class-diagram.md
+└── ai-usage/
 ```
 
-## Funcionalidades
+## Documentation
 
-### Gestión de productos
+The project includes:
 
-1. Registrar un nuevo videojuego.
-2. Registrar una nueva consola.
-3. Listar todos los productos disponibles en el inventario.
+- Module analysis documents.
+- Module class diagrams.
+- Integrated analysis.
+- Integrated class diagram.
+- Integrated layers diagram.
+- AI usage logs.
 
-### Gestión de personas
-
-4. Registrar un nuevo cliente.
-5. Listar todos los clientes registrados.
-6. Listar todos los vendedores registrados.
-
-### Gestión de ventas
-
-7. Registrar una nueva venta seleccionando cliente, vendedor y uno o más productos.
-8. Consultar el historial completo de ventas.
-9. Consultar el historial de compras de un cliente específico.
-10. Consultar el historial de ventas atendidas por un vendedor específico.
-
-## Inventario y ventas
-
-Antes de registrar una venta, el sistema verifica:
-
-- que el cliente exista;
-- que el vendedor exista;
-- que exista al menos un producto en la venta;
-- que los productos seleccionados existan;
-- que exista stock suficiente para las cantidades solicitadas.
-
-Cuando todas las validaciones son correctas, el sistema registra la venta, calcula su total y reduce el stock correspondiente.
-
-Si un mismo producto se incluye varias veces en una venta, el sistema considera la cantidad total solicitada al realizar la validación del stock.
-
-## Persistencia
-
-La aplicación utiliza archivos para conservar la información entre ejecuciones.
-
-Los datos se cargan automáticamente al iniciar el sistema y los cambios realizados durante la ejecución se guardan mediante las clases de persistencia.
-
-El archivo `data/sellers.csv` contiene los vendedores precargados necesarios para la primera ejecución.
-
-Los archivos de datos generados durante la ejecución, como los correspondientes a clientes, productos y ventas, son gestionados por la aplicación y se encuentran excluidos del control de versiones mediante `.gitignore`.
-
-## Documentación
-
-El proyecto incluye documentación relacionada con el análisis, la arquitectura y el diseño:
-
-- `docs/analysis.md`
-- `docs/hierarchy-diagram.md`
-- `docs/class-diagram.md`
-- `docs/layers-diagram.md`
-
-Las bitácoras individuales de uso de inteligencia artificial se encuentran en:
+The AI usage logs are stored in:
 
 ```text
 docs/ai-usage/
 ```
 
-## Ejecución
+Each team member maintains a personal log documenting the use of AI tools according to the integration requirement.
 
-El proyecto utiliza Maven y Java 17.
+## Execution
 
-Para compilar el proyecto se puede utilizar Maven mediante:
+The project uses Java 17 and Maven.
+
+Compile the project with:
 
 ```bash
 mvn clean compile
 ```
 
-La aplicación se inicia ejecutando la clase:
+The application entry point is:
 
 ```text
 com.gamezone.Main
 ```
 
-## Control de versiones
+## Version Control
 
-El proyecto utiliza un flujo basado en Git Flow simplificado:
+The project follows a Git Flow-based process using:
 
 ```text
 main
@@ -145,8 +325,21 @@ main
 develop
   ↑
 feature/*
+fix/*
+refactor/*
+docs/*
 ```
 
-Las nuevas funcionalidades y cambios se desarrollan en ramas `feature/*` y se integran a `develop` mediante Pull Requests revisados por otro integrante del equipo.
+All integration work is performed through Pull Requests targeting `develop`.
 
-`develop` es la rama de integración y `main` representa la versión estable del proyecto.
+Commits follow the Conventional Commits format and are written in English.
+
+## Integrated Documentation
+
+For a detailed explanation of the integration adjustments A1-A7, see:
+
+- `docs/integration-analysis.md`
+- `docs/integrated-class-diagram.md`
+- `docs/layers-diagram.md`
+
+The final integrated version must be verified through a complete scenario including a mixed sale, promotion application, extended warranty, partial return, stock restoration, warranty cancellation, refund calculation, and monthly balance.
