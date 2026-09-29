@@ -41,7 +41,7 @@ and resolves `Sale` and `Product` references from their identifiers.
 
 `Main` was adjusted to construct the objects without the circular dependency.
 
-The warranty class diagram was also updated to reflect the new dependency structure.
+The integrated class diagram documents the new warranty dependency structure.
 
 ---
 

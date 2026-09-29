@@ -125,8 +125,7 @@ The warranty module supports:
 
 The extended warranty cost is calculated as 10% of the covered product price.
 
-The warranty repository stores warranty identifiers and uses the service layer to resolve the corresponding sales and products. This prevents the circular dependency addressed during integration.
-
+The warranty repository stores raw warranty identifiers. `WarrantyService` resolves the corresponding sales and products using `SaleRepository` and `ProductService`. This prevents the circular dependency addressed during integration.
 ### Returns
 
 The integrated return module supports:
