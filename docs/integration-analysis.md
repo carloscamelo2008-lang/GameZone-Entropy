@@ -8,20 +8,15 @@ The promotion module originally limited `CategoryDiscount` to the `VIDEOGAME` an
 
 ### Solution
 
-`CategoryDiscount` was extended to recognize `ACCESSORY` as a valid target category and to identify instances of `Accessory` when calculating discounts.
-
 `PromotionService.registerCategoryDiscount` was updated to accept only the three supported categories:
 
 - `VIDEOGAME`
 - `CONSOLE`
 - `ACCESSORY`
 
-`ConsoleMenu` was also updated to allow the user to select accessories when registering a category-based promotion.
-
-The promotions data was extended with an accessory category promotion valid during the integration period.
+The promotion model and service were extended to support `ACCESSORY` as a valid target category. The promotion logic can therefore evaluate accessories when calculating category-based discounts.
 
 ---
-
 ## A2 — Warranty Circular Dependency
 
 ### Cause
@@ -35,8 +30,6 @@ This prevented the application from constructing the services cleanly through co
 ### Solution
 
 `WarrantyRepository` was redesigned to persist and load only the identifiers required to reconstruct warranty references.
-
-Instead of depending on `SaleService`, `WarrantyRepository` resolves sales through `SaleRepository`.
 
 `WarrantyService` receives:
 
@@ -81,10 +74,9 @@ The requirements for sales, promotions, accessories and warranties modified `Sal
 - extended warranty cost;
 - final total.
 
-The sales user interface was integrated so that products and accessories can be selected and an extended warranty can be requested for each console.
+`SaleService` was integrated to support both products and accessories in the same sale, while the current `UI` supports product selection and extended warranty requests for consoles. The remaining application-level UI integration is handled by the Technical Leader.
 
 ---
-
 ## A4 — Return Accessory Stock
 
 ### Cause
@@ -154,8 +146,7 @@ In addition, the total sales must represent the final amount of each sale, inclu
 
 `monthly sales - monthly returns`
 
-The Technical Leader is responsible for integrating these three values into `ConsoleMenu`.
-
+The Technical Leader is responsible for integrating these three values into the application user interface.
 ---
 
 ## A7 — Warranty Cancellation on Console Return
@@ -181,4 +172,4 @@ The refundable amount is determined through the warranty polymorphism:
 
 `Return` was extended with a separate `warrantyRefundAmount` value. This amount is added to the total refund and displayed in the return receipt when applicable.
 
-The Technical Leader is responsible for connecting `ReturnService` to the application startup and user interface.
+The Technical Leader is responsible for the remaining application-level integration of `ReturnService` into the application startup and user interface.
