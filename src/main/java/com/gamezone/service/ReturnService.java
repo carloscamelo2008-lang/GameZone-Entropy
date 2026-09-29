@@ -1,6 +1,7 @@
 package com.gamezone.service;
 
 import com.gamezone.model.Accessory;
+import com.gamezone.model.Console;
 import com.gamezone.model.Product;
 import com.gamezone.model.Return;
 import com.gamezone.model.Sale;
@@ -24,6 +25,7 @@ public class ReturnService {
     private final SaleService saleService;
     private final ProductService productService;
     private final AccessoryService accessoryService;
+    private final WarrantyService warrantyService;
     private final List<Return> returns;
 
     /**
@@ -33,13 +35,15 @@ public class ReturnService {
      * @param saleService      service used to find the original sales
      * @param productService   service used to restore product stock
      * @param accessoryService service used to restore accessory stock
+     * @param warrantyService  service used to cancel warranties of returned consoles
      */
     public ReturnService(ReturnRepository returnRepository, SaleService saleService, ProductService productService,
-            AccessoryService accessoryService) {
+            AccessoryService accessoryService, WarrantyService warrantyService) {
         this.returnRepository = returnRepository;
         this.saleService = saleService;
         this.productService = productService;
         this.accessoryService = accessoryService;
+        this.warrantyService = warrantyService;
         this.returns = returnRepository.loadAll();
     }
 
@@ -111,6 +115,17 @@ public class ReturnService {
 
         for (Map.Entry<String, Integer> entry : requested.entrySet()) {
             restoreItemStock(findProductInSale(sale, entry.getKey()), entry.getValue());
+        }
+
+        double warrantyRefund = 0;
+        for (String productId : requested.keySet()) {
+            Product product = findProductInSale(sale, productId);
+            if (product instanceof Console) {
+                warrantyRefund += warrantyService.cancelWarranties(productId, saleId);
+            }
+        }
+        if (warrantyRefund > 0) {
+            newReturn.addWarrantyRefund(warrantyRefund);
         }
 
         returns.add(newReturn);
