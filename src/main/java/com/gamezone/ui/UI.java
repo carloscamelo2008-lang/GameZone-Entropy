@@ -10,6 +10,7 @@ import java.util.List;
 import java.util.Scanner;
 import com.gamezone.model.Accessory;
 import com.gamezone.service.AccessoryService;
+import com.gamezone.service.ReturnService;
 
 /**
  * Provides the console-based user interface for GameZone.
@@ -21,6 +22,7 @@ public class UI {
     private final AccessoryService accessoryService;
     private final SaleService saleService;
     private final Scanner scanner;
+    private final ReturnService returnService;
 
     /**
      * Creates a new user interface.
@@ -29,18 +31,21 @@ public class UI {
      * @param productService service used to manage products
      * @param saleService service used to manage sales
      * @param accessoryService service used to manage accessories
+     * @param returnService service used to calculate returns and monthly balance
      */
     public UI(
             PersonService personService,
             ProductService productService,
             AccessoryService accessoryService,
-            SaleService saleService) {
+            SaleService saleService,
+            ReturnService returnService) {
 
         this.personService = personService;
         this.productService = productService;
         this.accessoryService = accessoryService;
         this.saleService = saleService;
         this.scanner = new Scanner(System.in);
+        this.returnService = returnService;
     }
     /**
      * Starts the console user interface.
@@ -93,6 +98,9 @@ public class UI {
                 case "11":
                     manageAccessories();
                     break;
+                case "12":
+                    showMonthlyBalance();
+                    break;
                 default:
                     System.out.println("Opción no válida. Intente nuevamente.");
                     break;
@@ -117,6 +125,7 @@ public class UI {
         System.out.println("9. Historial de compras de cliente");
         System.out.println("10. Historial de ventas de vendedor");
         System.out.println("11. Gestionar accesorios");
+        System.out.println("12. Balance mensual");
         System.out.println("0. Salir");
         System.out.print("Seleccione una opción: ");
     }
@@ -790,6 +799,31 @@ public class UI {
                     "Error al asignar la consola compatible: "
                             + e.getMessage()
             );
+        }
+    }
+    /**
+     * Displays the monthly sales, returns, and net balance.
+     */
+    private void showMonthlyBalance() {
+        System.out.println("\n===== BALANCE MENSUAL =====");
+
+        System.out.print("Mes (1-12): ");
+        int month = Integer.parseInt(scanner.nextLine());
+
+        System.out.print("Año: ");
+        int year = Integer.parseInt(scanner.nextLine());
+
+        try {
+            double monthlySales = returnService.calculateMonthlySales(month, year);
+            double monthlyReturns = returnService.calculateMonthlyReturns(month, year);
+            double monthlyBalance = returnService.generateMonthlyBalance(month, year);
+
+            System.out.println("Total de ventas: $" + monthlySales);
+            System.out.println("Total de devoluciones: $" + monthlyReturns);
+            System.out.println("Balance neto: $" + monthlyBalance);
+
+        } catch (Exception e) {
+            System.out.println("Error al generar el balance mensual: " + e.getMessage());
         }
     }
 }

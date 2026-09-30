@@ -146,7 +146,10 @@ In addition, the total sales must represent the final amount of each sale, inclu
 
 `monthly sales - monthly returns`
 
-The monthly calculations are implemented in ReturnService. The Technical Leader is responsible for integrating these values into the application user interface.
+
+The three monthly values are integrated into the console user interface through the monthly balance option.
+
+
 ---
 
 ## A7 — Warranty Cancellation on Console Return
@@ -172,4 +175,4 @@ The refundable amount is determined through the warranty polymorphism:
 
 `Return` was extended with a separate `warrantyRefundAmount` value. This amount is added to the total refund and displayed in the return receipt when applicable.
 
-The Technical Leader is responsible for the remaining application-level integration of `ReturnService` into the application startup and user interface.
+`ReturnService` is integrated into the application startup and is used by the monthly balance option in the console user interface.
