@@ -1,4 +1,3 @@
-```markdown
 # Return Analysis
 
 ## Purpose
@@ -69,6 +68,8 @@ If an extended warranty existed, its additional cost is included in the refund.
 
 ## ReturnRepository
 
-`ReturnRepository` persists return information in CSV format.
+`ReturnRepository` persists the return identifier, date, original sale reference, returned product identifiers and reason in CSV format.
 
 During loading, sale references are resolved through `SaleRepository`, while returned products are resolved through both `ProductService` and `AccessoryService`.
+
+Refund amounts are recalculated from the original sale and returned products when the `Return` object is reconstructed. The current CSV format does not persist `warrantyRefundAmount`.

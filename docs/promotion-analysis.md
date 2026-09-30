@@ -24,11 +24,11 @@ Its main responsibilities are:
 
 ### PercentageDiscount
 
-Applies a percentage discount to the total value of the sale.
+Applies a percentage discount to the sale subtotal.
 
 Formula:
 
-`total × percentage / 100`
+`subtotal × percentage / 100`
 
 ### CategoryDiscount
 

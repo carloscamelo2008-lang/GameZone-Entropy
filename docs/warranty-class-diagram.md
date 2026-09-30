@@ -1,14 +1,16 @@
 # Warranty Module - Class Diagram
 
-This diagram reflects the warranty module as implemented, including the
-fix applied by the `fix/warranty-circular-dependency` integration
-adjustment (A2): `WarrantyRepository` resolves sale references through
-`SaleRepository` instead of `SaleService`, avoiding the circular
-dependency `SaleService -> WarrantyService -> WarrantyRepository ->
-SaleService` that the original Requirement 4 design would have produced.
+This diagram reflects the warranty module as implemented, including
+the A2 integration adjustment that removes the circular dependency
+between `SaleService`, `WarrantyService` and `WarrantyRepository`.
+
+The repository stores raw warranty data and does not resolve `Sale`
+or `Product` references. `WarrantyService` is responsible for resolving
+those references through `SaleRepository` and `ProductService`.
 
 ```mermaid
 classDiagram
+
     class Warranty {
         <<abstract>>
         -String id
@@ -35,7 +37,7 @@ classDiagram
     }
 
     class ExtendedWarranty {
-        -double COST_PERCENTAGE
+        -static final double COST_PERCENTAGE
         +getDurationInMonths() int
         +getWarrantyType() String
         +getAdditionalCost() double
@@ -43,14 +45,27 @@ classDiagram
 
     class WarrantyRepository {
         -String filePath
-        -SaleRepository saleRepository
-        -ProductService productService
         +saveAll(List~Warranty~ warranties) void
-        +loadAll() List~Warranty~
+        +loadAll() List~WarrantyRecord~
+    }
+
+    class WarrantyRecord {
+        -String id
+        -String type
+        -String productId
+        -String saleReference
+        -LocalDate startDate
+        +getId() String
+        +getType() String
+        +getProductId() String
+        +getSaleReference() String
+        +getStartDate() LocalDate
     }
 
     class WarrantyService {
         -WarrantyRepository warrantyRepository
+        -SaleRepository saleRepository
+        -ProductService productService
         -List~Warranty~ warranties
         +assignBasicWarranty(Product, Sale, LocalDate) BasicWarranty
         +assignExtendedWarranty(Product, Sale, LocalDate) ExtendedWarranty
@@ -58,6 +73,7 @@ classDiagram
         +listAllWarranties() List~Warranty~
         +listActiveWarranties() List~Warranty~
         +listWarrantiesExpiringSoon(int daysAhead) List~Warranty~
+        +cancelWarranties(String productId, String saleId) double
     }
 
     class Product {
@@ -86,37 +102,50 @@ classDiagram
 
     Warranty <|-- BasicWarranty
     Warranty <|-- ExtendedWarranty
+
     Warranty "many" --> "1" Product : covers
     Warranty "many" --> "1" Sale : belongs to
 
     WarrantyRepository ..> Warranty : persists
-    WarrantyRepository --> SaleRepository : resolves sale references
-    WarrantyRepository --> ProductService : resolves product references
+    WarrantyRepository ..> WarrantyRecord : creates
 
     WarrantyService --> WarrantyRepository : uses
+    WarrantyService --> SaleRepository : resolves sales
+    WarrantyService --> ProductService : resolves products
     WarrantyService ..> Warranty : creates
 
-    SaleService --> WarrantyService : assigns warranties on sale
+    SaleService --> WarrantyService : assigns warranties
 ```
 
 ## Key design notes
 
-- `Warranty` is abstract and stores only common attributes (id, product,
-  sale, start/end date); duration, type and additional cost are resolved
-  polymorphically through abstract methods implemented by
-  `BasicWarranty` and `ExtendedWarranty`.
-- `Sale` currently has no unique identifier of its own. Both
-  `WarrantyRepository` (when persisting/loading) and `WarrantyService`
-  (when looking up a warranty by sale) identify a sale using a composite
-  reference built from `sale.getDate()` and `sale.getCustomer().getId()`.
-- `WarrantyRepository` depends on `SaleRepository` and `ProductService`
-  only, never on `SaleService`. This is the fix applied by the A2
-  integration adjustment: the original Requirement 4 design would have
-  had `WarrantyRepository` depend on `SaleService`, creating a circular
-  dependency with `SaleService` (which itself needs `WarrantyService` to
-  assign warranties during `registerSale`).
-- `Main` constructs the objects in this order: repositories, then
-  `ProductService`/`PersonService`, then `SaleService`, then
-  `WarrantyRepository` (using `SaleRepository` directly), then
-  `WarrantyService`. This order is only possible because the circular
-  dependency was removed.
+- `Warranty` is abstract and stores the common warranty information:
+  product, sale, start date and end date. Duration, warranty type and
+  additional cost are resolved polymorphically by the concrete warranty
+  classes.
+
+- `BasicWarranty` provides 6 months of coverage with no additional cost.
+
+- `ExtendedWarranty` provides 12 months of coverage and calculates an
+  additional cost equal to 10% of the covered product price.
+
+- `WarrantyRepository` is responsible only for reading and writing
+  raw warranty data. It does not depend on `SaleService`,
+  `SaleRepository` or `ProductService`.
+
+- `WarrantyRepository.loadAll()` returns `WarrantyRecord` objects
+  containing raw identifiers. `WarrantyService` resolves the referenced
+  sales and products and reconstructs the corresponding warranty objects.
+
+- `WarrantyService` depends directly on `SaleRepository` and
+  `ProductService` to resolve references. This design avoids the
+  circular dependency that would occur if `WarrantyRepository`
+  depended on `SaleService`, while `SaleService` also depended on
+  `WarrantyService`.
+
+- `WarrantyService.cancelWarranties(...)` removes the warranties
+  associated with a returned console and returns the refundable
+  additional warranty cost.
+
+- `SaleService` uses `WarrantyService` during sale registration to
+  assign the basic warranty and any requested extended warranty.

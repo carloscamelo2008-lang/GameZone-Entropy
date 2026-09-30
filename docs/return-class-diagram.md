@@ -49,6 +49,8 @@ classDiagram
     }
 
     class Sale
+    class SaleService
+    class SaleRepository
     class Product
     class ProductService
     class AccessoryService
@@ -67,3 +69,4 @@ classDiagram
     ReturnRepository --> SaleRepository : resolves sales
     ReturnRepository --> ProductService : resolves products
     ReturnRepository --> AccessoryService : resolves accessories
+```

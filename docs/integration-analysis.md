@@ -77,8 +77,7 @@ The requirements for sales, promotions, accessories and warranties modified `Sal
 - extended warranty cost;
 - final total.
 
-`SaleService` was integrated to support both products and accessories in the same sale, while the current `UI` supports product selection and extended warranty requests for consoles. The remaining application-level UI integration is handled by the Technical Leader.
-
+`SaleService` was integrated to support both products and accessories in the same sale, while the current `UI` supports product selection and extended warranty requests for consoles.
 ---
 ## A4 — Return Accessory Stock
 
@@ -177,5 +176,3 @@ The refundable amount is determined through the warranty polymorphism:
 `ReturnService.registerReturn` now invokes the warranty cancellation logic for each returned console and adds the refundable warranty amount to the return.
 
 `Return` was extended with a separate `warrantyRefundAmount` value. This amount is added to the total refund and displayed in the return receipt when applicable.
-
-`ReturnService` is integrated into the application startup and is used by the monthly balance option in the console user interface.

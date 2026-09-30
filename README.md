@@ -81,7 +81,7 @@ Category discounts support:
 - `CONSOLE`
 - `ACCESSORY`
 
-`PromotionService.findBestPromotionFor(...)` selects the active promotion that provides the largest monetary discount for a sale.
+`PromotionService.findBestPromotionFor(...)` selects the applicable promotion that provides the largest monetary discount based on the sale date.
 
 ### Sales
 
@@ -126,6 +126,7 @@ The warranty module supports:
 The extended warranty cost is calculated as 10% of the covered product price.
 
 The warranty repository stores raw warranty identifiers. `WarrantyService` resolves the corresponding sales and products using `SaleRepository` and `ProductService`. This prevents the circular dependency addressed during integration.
+
 ### Returns
 
 The integrated return module supports:
@@ -161,6 +162,8 @@ Monthly sales use each sale's final total, including promotions and extended war
 The monthly net balance is calculated as:
 
 `monthly sales - monthly returns`
+
+The three monthly values are displayed through the monthly balance option in the console user interface.
 
 ## Architecture
 
@@ -268,6 +271,7 @@ src/main/java/com/gamezone/
 ├── service/
 ├── ui/
 └── Main.java
+
 docs/
 ├── analysis.md
 ├── class-diagram.md
