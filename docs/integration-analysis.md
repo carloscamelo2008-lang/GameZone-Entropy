@@ -146,7 +146,7 @@ In addition, the total sales must represent the final amount of each sale, inclu
 
 `monthly sales - monthly returns`
 
-The Technical Leader is responsible for integrating these three values into the application user interface.
+The monthly calculations are implemented in ReturnService. The Technical Leader is responsible for integrating these values into the application user interface.
 ---
 
 ## A7 — Warranty Cancellation on Console Return
