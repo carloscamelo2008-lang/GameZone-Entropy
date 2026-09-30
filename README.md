@@ -270,11 +270,14 @@ src/main/java/com/gamezone/
 └── Main.java
 
 docs/
+├── analysis.md
+├── class-diagram.md
+├── hierarchy-diagram.md
+├── layers-diagram.md
 ├── accessory-analysis.md
 ├── accessory-class-diagram.md
 ├── integration-analysis.md
 ├── integrated-class-diagram.md
-├── layers-diagram.md
 ├── warranty-class-diagram.md
 └── ai-usage/
 ```
