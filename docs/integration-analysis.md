@@ -15,6 +15,9 @@ The promotion module originally limited `CategoryDiscount` to the `VIDEOGAME` an
 - `ACCESSORY`
 
 The promotion model and service were extended to support `ACCESSORY` as a valid target category. The promotion logic can therefore evaluate accessories when calculating category-based discounts.
+The current implementation identifies `ACCESSORY` using a fallback that treats any product that is neither a `VideoGame` nor a `Console` as an accessory.
+
+This is a known limitation because future product types could be classified incorrectly. The fallback should be replaced with an explicit `instanceof Accessory` check once the promotion module is updated.
 
 ---
 ## A2 — Warranty Circular Dependency

@@ -268,7 +268,6 @@ src/main/java/com/gamezone/
 ├── service/
 ├── ui/
 └── Main.java
-
 docs/
 ├── analysis.md
 ├── class-diagram.md
@@ -276,9 +275,14 @@ docs/
 ├── layers-diagram.md
 ├── accessory-analysis.md
 ├── accessory-class-diagram.md
+├── promotion-analysis.md
+├── promotion-class-diagram.md
+├── warranty-analysis.md
+├── warranty-class-diagram.md
+├── return-analysis.md
+├── return-class-diagram.md
 ├── integration-analysis.md
 ├── integrated-class-diagram.md
-├── warranty-class-diagram.md
 └── ai-usage/
 ```
 
