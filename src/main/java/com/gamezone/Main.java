@@ -13,6 +13,8 @@ import com.gamezone.service.PromotionService;
 import com.gamezone.service.SaleService;
 import com.gamezone.service.WarrantyService;
 import com.gamezone.ui.UI;
+import com.gamezone.persistence.ReturnRepository;
+import com.gamezone.service.ReturnService;
 
 /**
  * Application entry point for the GameZone system.
@@ -81,6 +83,22 @@ public class Main {
                         promotionService,
                         warrantyService
                 );
+        ReturnRepository returnRepository =
+                new ReturnRepository(
+                        "data/returns.csv",
+                        saleRepository,
+                        productService,
+                        accessoryService
+                );
+
+        ReturnService returnService =
+                new ReturnService(
+                        returnRepository,
+                        saleService,
+                        productService,
+                        accessoryService,
+                        warrantyService
+                );
 
         // TODO: wire warrantyService into UI/ConsoleMenu once the warranty
         // management submenu is added (Líder Técnico, per Requirement 4).
@@ -88,9 +106,9 @@ public class Main {
                 personService,
                 productService,
                 accessoryService,
-                saleService
+                saleService,
+                returnService
         );
-
         ui.start();
     }
 }
