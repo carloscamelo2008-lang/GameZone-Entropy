@@ -71,3 +71,4 @@ classDiagram
     PromotionService --> PromotionRepository : persists
     PromotionService --> Promotion : manages
     PromotionService --> Sale : evaluates
+```
