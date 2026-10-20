@@ -1,8 +1,8 @@
-package com.gamezone.validator;
+package com.gamezone.validation;
 
-import com.gamezone.exception.BusinessRuleException;
-import com.gamezone.exception.InvalidDataException;
-import com.gamezone.exception.ResourceNotFoundException;
+import com.gamezone.exceptions.BusinessRuleException;
+import com.gamezone.exceptions.InvalidDataException;
+import com.gamezone.exceptions.ResourceNotFoundException;
 import com.gamezone.model.Customer;
 import com.gamezone.model.Product;
 import com.gamezone.model.Seller;

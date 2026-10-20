@@ -1,4 +1,4 @@
-package com.gamezone.exception;
+package com.gamezone.exceptions;
 
 /**
  * Base class of every application-specific exception of GameZone.

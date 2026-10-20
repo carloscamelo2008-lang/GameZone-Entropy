@@ -1,4 +1,4 @@
-package com.gamezone.exception;
+package com.gamezone.exceptions;
 
 /**
  * Thrown when an entity requested by id (product, accessory, customer,

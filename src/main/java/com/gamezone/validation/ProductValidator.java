@@ -1,8 +1,8 @@
-package com.gamezone.validator;
+package com.gamezone.validation;
 
-import com.gamezone.exception.BusinessRuleException;
-import com.gamezone.exception.InvalidDataException;
-import com.gamezone.exception.ResourceNotFoundException;
+import com.gamezone.exceptions.BusinessRuleException;
+import com.gamezone.exceptions.InvalidDataException;
+import com.gamezone.exceptions.ResourceNotFoundException;
 import com.gamezone.model.Product;
 
 /**
@@ -177,10 +177,15 @@ public final class ProductValidator {
      *
      * @param product the product being requested
      * @param quantity the requested number of units
+     * @throws ResourceNotFoundException if the product is {@code null}
      * @throws InvalidDataException if the quantity is not positive
      * @throws BusinessRuleException if the stock is insufficient
      */
     public static void validateSufficientStock(Product product, int quantity) {
+        if (product == null) {
+            throw new ResourceNotFoundException(
+                    "No se encontró el producto solicitado.");
+        }
         validateQuantity(quantity);
         if (product.getStock() < quantity) {
             throw new BusinessRuleException(

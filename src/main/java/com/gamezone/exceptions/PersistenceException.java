@@ -1,4 +1,4 @@
-package com.gamezone.exception;
+package com.gamezone.exceptions;
 
 /**
  * Thrown when reading from or writing to the data files fails. It wraps the

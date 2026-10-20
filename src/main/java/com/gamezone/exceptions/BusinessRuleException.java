@@ -1,10 +1,11 @@
-package com.gamezone.exception;
+package com.gamezone.exceptions;
 
 /**
- * Thrown when the data supplied by the user is malformed or out of range,
- * for example an empty name, a negative price or an invalid e-mail.
+ * Thrown when an operation is well formed but violates a business rule,
+ * for example selling more units than the available stock or registering
+ * a customer whose id already exists.
  */
-public class InvalidDataException extends GameZoneException {
+public class BusinessRuleException extends GameZoneException {
 
     private static final long serialVersionUID = 1L;
 
@@ -13,7 +14,7 @@ public class InvalidDataException extends GameZoneException {
      *
      * @param message the detail message, shown to the user by the UI
      */
-    public InvalidDataException(String message) {
+    public BusinessRuleException(String message) {
         super(message);
     }
 
@@ -23,7 +24,7 @@ public class InvalidDataException extends GameZoneException {
      * @param message the detail message, shown to the user by the UI
      * @param cause the underlying exception that triggered this one
      */
-    public InvalidDataException(String message, Throwable cause) {
+    public BusinessRuleException(String message, Throwable cause) {
         super(message, cause);
     }
 }
