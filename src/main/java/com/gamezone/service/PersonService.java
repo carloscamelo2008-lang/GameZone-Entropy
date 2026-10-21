@@ -3,6 +3,7 @@ package com.gamezone.service;
 import com.gamezone.model.Customer;
 import com.gamezone.model.Seller;
 import com.gamezone.persistence.PersonRepository;
+import com.gamezone.validation.PersonValidator;
 
 import java.util.List;
 
@@ -39,7 +40,7 @@ public class PersonService {
      * @return the newly created Customer
      */
     public Customer registerCustomer(String id, String name, String phone, String email) {
-        if (findCustomerById(id) != null) { throw new IllegalArgumentException("Customer ID already exists: " + id); }
+        PersonValidator.validateCustomerIdAvailable(findCustomerById(id), id);
         Customer customer = new Customer(id, name, phone, email);
         customers.add(customer);
         personRepository.saveCustomers(customers);
