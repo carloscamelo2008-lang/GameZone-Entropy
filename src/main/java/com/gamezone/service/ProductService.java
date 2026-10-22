@@ -17,11 +17,13 @@ public class ProductService {
     private ProductRepository repository;
     private List<Product> products;
 
-    /**
+      /**
      * Creates a new product service backed by the given repository,
      * loading any previously stored products.
      *
      * @param repository the repository used for persistence
+     * @throws com.gamezone.exceptions.PersistenceException if the products
+     *         file cannot be read
      */
     public ProductService(ProductRepository repository){
         this.repository = repository;
@@ -54,12 +56,14 @@ public class ProductService {
         return false;
     }
 
-    /**
+      /**
      * Reduces the stock of a product by the given quantity.
      * If the product does not exist, no changes are made.
      *
      * @param id       the id of the product to update
      * @param quantity the quantity to subtract from stock
+     * @throws com.gamezone.exceptions.PersistenceException if the products
+     *         file cannot be written
      */
     public void reduceStock(String id,int quantity){
         for (Product product : products) {
@@ -70,11 +74,13 @@ public class ProductService {
             }
         }
     }
-    /**
+       /**
      * Restores the stock of a product by the given quantity.
      *
      * @param id the id of the product to update
      * @param quantity the quantity to add to stock
+     * @throws com.gamezone.exceptions.PersistenceException if the products
+     *         file cannot be written
      */
     public void restoreStock(String id, int quantity) {
         for (Product product : products) {
@@ -86,7 +92,7 @@ public class ProductService {
         }
     }
 
-    /**
+        /**
      * Registers a new video game, adding it to the managed list and
      * persisting the updated inventory.
      *
@@ -98,6 +104,8 @@ public class ProductService {
      * @param genre     genre of the video game
      * @param ageRating recommended age rating
      * @return the newly created video game
+     * @throws com.gamezone.exceptions.PersistenceException if the products
+     *         file cannot be written
      */
     public VideoGame registerVideoGame(String id,String title,double price,int stock,String platform,String genre, String ageRating){
         VideoGame videoGame = new VideoGame(id,title,price,stock,platform,genre, ageRating);
@@ -107,7 +115,7 @@ public class ProductService {
     }
 
 
-    /**
+        /**
      * Registers a new console, adding it to the managed list and
      * persisting the updated inventory.
      *
@@ -119,6 +127,8 @@ public class ProductService {
      * @param price      unit price
      * @param stock      initial quantity in inventory
      * @return the newly created console
+     * @throws com.gamezone.exceptions.PersistenceException if the products
+     *         file cannot be written
      */
     public Console registerConsole(String id,String title,String brand, String model, String generation,double price,int stock){
         Console console = new Console(id, title, price, stock, brand, model, generation);
