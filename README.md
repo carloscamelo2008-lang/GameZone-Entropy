@@ -289,6 +289,8 @@ docs/
 ├── return-class-diagram.md
 ├── integration-analysis.md
 ├── integrated-class-diagram.md
+├── exception-analysis.md
+├── exception-class-diagram.md
 └── ai-usage/
 ```
 
@@ -302,6 +304,7 @@ The project includes:
 - Integrated class diagram.
 - Integrated layers diagram.
 - AI usage logs.
+- Exception handling analysis and class diagram.
 
 The AI usage logs are stored in:
 
