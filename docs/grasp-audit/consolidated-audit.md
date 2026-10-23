@@ -144,3 +144,19 @@ The order prioritizes contained persistence and reporting changes, then the mode
 - Coverage and ownership have been checked against the role allocation described in the requirement.
 - All defects outside the GRASP correction scope are recorded separately.
 - No application-code changes, class-diagram before/after edits, or Phase 2 refactor-log entries are included in this Phase 1 consolidation.
+
+
+## 9. Phase 1 gate checklist
+
+- [x] Developer 2's individual audit has been approved and merged (PR #38).
+- [x] Developer 1's individual audit has been approved and merged (PR #39).
+- [x] The Technical Leader's individual audit is included for review.
+- [x] The coverage matrix assigns the documented code responsibilities to the three roles.
+- [x] Related pattern labels share one final finding ID per underlying issue.
+- [x] Cross-owner corrections identify both the model/service-side owner and the coordination responsibility.
+- [x] Functional observations outside the refactor scope are preserved separately.
+- [x] The five guiding questions are answered in `docs/grasp-analysis.md`.
+- [ ] Technical Leader's consolidated PR is cross-reviewed and approved.
+- [ ] The consolidated Phase 1 audit is merged into `develop`.
+
+Phase 2 remains blocked until the last two review/merge gates are complete. After that merge, the team can create `feature/grasp-refactor`, establish the before-diagram and baseline verification record, and begin the assigned corrections.
