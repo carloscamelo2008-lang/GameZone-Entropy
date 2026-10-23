@@ -5,7 +5,7 @@ import com.gamezone.model.Cable;
 import com.gamezone.model.Controller;
 import com.gamezone.model.Memory;
 import com.gamezone.persistence.AccessoryRepository;
-
+import com.gamezone.exceptions.InvalidDataException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -170,9 +170,7 @@ public class AccessoryService {
         }
 
         if (consoleId == null || consoleId.isBlank()) {
-            throw new ValidationException(
-                    "Console ID cannot be empty."
-            );
+throw new InvalidDataException("Console ID cannot be empty.");
         }
 
         if (!accessory.getCompatibleConsoleIds().contains(consoleId)) {
