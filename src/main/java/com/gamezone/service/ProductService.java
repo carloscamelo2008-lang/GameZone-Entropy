@@ -106,15 +106,17 @@ public class ProductService {
      * @throws com.gamezone.exceptions.PersistenceException if the products
      *         file cannot be written
      */
-   public VideoGame registerVideoGame(String id, String title, double price, int stock, String platform, String genre, String ageRating){
-        Product existing = findProductById(id);
-        ProductValidator.validateIdAvailable(existing, id);
-
-        ProductValidator.validateVideoGame(id, title, price, stock, platform, genre, ageRating);
-        products.add(videoGame);
-        repository.saveAll(products);
-        return videoGame;
-    }
+public VideoGame registerVideoGame(String id, String title, double price, int stock, String platform, String genre, String ageRating) {
+    Product existing = findProductById(id);
+    ProductValidator.validateIdAvailable(existing, id);
+    ProductValidator.validateVideoGame(id, title, price, stock, platform, genre, ageRating);
+    
+    VideoGame videoGame = new VideoGame(id, title, price, stock, platform, genre, ageRating);
+    
+    products.add(videoGame);
+    repository.saveAll(products);
+    return videoGame;
+}
 
 
     /**
@@ -133,15 +135,17 @@ public class ProductService {
      * @throws com.gamezone.exceptions.PersistenceException if the products
      *         file cannot be written
      */
-    public Console registerConsole(String id,String title,String brand, String model, String generation,double price,int stock){
-        Product existing = findProductById(id);
-        ProductValidator.validateIdAvailable(existing, id);
-
-        ProductValidator.validateConsole(id, title, brand, model, generation, price, stock);
-        products.add(console);
-        repository.saveAll(products);
-        return console;
-    }
+   public Console registerConsole(String id, String title, String brand, String model, String generation, double price, int stock) {
+    Product existing = findProductById(id);
+    ProductValidator.validateIdAvailable(existing, id);
+    ProductValidator.validateConsole(id, title, brand, model, generation, price, stock);
+    
+    Console console = new Console(id, title, price, stock, brand, model, generation);
+    
+    products.add(console);
+    repository.saveAll(products);
+    return console;
+}
 
     /**
      * Finds a product by its id.
