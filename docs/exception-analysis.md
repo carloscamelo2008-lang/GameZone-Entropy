@@ -62,7 +62,9 @@ The console `UI` catches `GameZoneException` around operations that can raise ap
 
 The main menu also handles `NumberFormatException` so that malformed numeric input can be reported without unnecessarily terminating the menu.
 
-These handlers cover exceptions that reach the menu's execution flow. Exceptions raised while services are being constructed in `Main` occur before `UI.start()` begins and require separate consideration if startup error reporting is part of the required behavior.
+The `Main.main()` method wraps application initialization and the call to `ui.start()` in a `try-catch` block for `GameZoneException`. If such an exception escapes these operations, the application displays a startup error message through the standard error stream.
+
+These handlers provide error reporting for application-specific failures during initialization and for exceptions that reach the menu execution flow.
 
 ## 7. Design Benefits
 
