@@ -2,7 +2,7 @@ package com.gamezone.persistence;
 
 import com.gamezone.model.BasicWarranty;
 import com.gamezone.model.Warranty;
-
+import com.gamezone.exceptions.PersistenceException;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
@@ -48,7 +48,7 @@ public class WarrantyRepository {
                 writer.println(toCsvLine(warranty));
             }
         } catch (IOException e) {
-            System.out.println("Error saving warranties: " + e.getMessage());
+            throw new PersistenceException("Error saving warranties: " + e.getMessage(), e);
         }
     }
 
@@ -78,7 +78,7 @@ public class WarrantyRepository {
                 records.add(fromCsvLine(line));
             }
         } catch (IOException e) {
-            System.out.println("Error loading warranties: " + e.getMessage());
+            throw new PersistenceException("Error loading warranties: " + e.getMessage(), e);
         }
 
         return records;

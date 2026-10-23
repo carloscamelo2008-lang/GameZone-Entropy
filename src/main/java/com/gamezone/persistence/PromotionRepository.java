@@ -4,7 +4,7 @@ import com.gamezone.model.BulkPurchaseDiscount;
 import com.gamezone.model.CategoryDiscount;
 import com.gamezone.model.PercentageDiscount;
 import com.gamezone.model.Promotion;
-
+import com.gamezone.exceptions.PersistenceException;
 import java.io.*;
 import java.time.LocalDate;
 import java.time.format.DateTimeParseException;
@@ -52,7 +52,7 @@ public class PromotionRepository {
                 }
             }
         } catch (IOException e) {
-            System.out.println("Error saving promotions: " + e.getMessage());
+            throw new PersistenceException("Error saving promotions: " + e.getMessage(), e);
         }
     }
 
@@ -82,7 +82,7 @@ public class PromotionRepository {
                 }
             }
         } catch (IOException e) {
-            System.out.println("Error loading promotions: " + e.getMessage());
+            throw new PersistenceException("Error loading promotions: " + e.getMessage(), e);
         }
 
         return promotions;
