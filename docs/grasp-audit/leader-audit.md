@@ -86,3 +86,48 @@ The workflow selects warranty behavior with explicit type checks:
 This is behavior that varies by product subtype, but the variation is encoded as conditionals in two classes rather than exposed through one polymorphic eligibility contract or a single warranty-policy abstraction. If another product subtype becomes eligible for warranties, both locations would need coordinated edits.
 
 **Evidence:** [UI.java, lines 400-424](https://github.com/carloscamelo2008-lang/GameZone-Entropy/blob/f6f35d676e8a29cdddabb28a093a1158175aa266/src/main/java/com/gamezone/ui/UI.java#L400-L424); [SaleService.java, lines 147-182](https://github.com/carloscamelo2008-lang/GameZone-Entropy/blob/f6f35d676e8a29cdddabb28a093a1158175aa266/src/main/java/com/gamezone/service/SaleService.java#L147-L182).
+
+
+## 7. Pure Fabrication
+
+**Verdict: `correct`**
+
+- `SaleRepository` is a non-domain class that isolates file serialization and reading/writing responsibilities from `Sale` and the sale workflow.
+- `SaleService` is a service-level fabrication that coordinates validation and the collaborating product, people, accessory, promotion, warranty, and persistence modules. It avoids placing file access or the entire transaction workflow inside the `Sale` entity.
+- `ProductService.restoreStock()` keeps stock collection management and persistence coordination in the service layer instead of adding repository operations to the product entity.
+
+**Evidence:** [SaleRepository.java, lines 12-55](https://github.com/carloscamelo2008-lang/GameZone-Entropy/blob/f6f35d676e8a29cdddabb28a093a1158175aa266/src/main/java/com/gamezone/persistence/SaleRepository.java#L12-L55); [SaleService.java, lines 20-59 and 78-204](https://github.com/carloscamelo2008-lang/GameZone-Entropy/blob/f6f35d676e8a29cdddabb28a093a1158175aa266/src/main/java/com/gamezone/service/SaleService.java#L20-L204); [ProductService.java, restoreStock](https://github.com/carloscamelo2008-lang/GameZone-Entropy/blob/f6f35d676e8a29cdddabb28a093a1158175aa266/src/main/java/com/gamezone/service/ProductService.java#L74-L84).
+
+## 8. Indirection
+
+**Verdict: `correct`**
+
+- The UI requests operations through services rather than accessing repositories directly.
+- `SaleService` collaborates with `ProductService`, `AccessoryService`, `PersonService`, `PromotionService`, and `WarrantyService` for each module's operations, while sale persistence is delegated to `SaleRepository`.
+- `Main` centralizes object construction and dependency wiring; the UI does not construct repositories or open data files itself.
+
+This provides service and repository intermediaries between the console and persistence. The concrete subtype check in `LEAD-GRASP-01` is captured under Low Coupling, High Cohesion, Polymorphism, and Protected Variations, not treated as a separate failure of Indirection.
+
+**Evidence:** [UI.java, constructor and fields](https://github.com/carloscamelo2008-lang/GameZone-Entropy/blob/f6f35d676e8a29cdddabb28a093a1158175aa266/src/main/java/com/gamezone/ui/UI.java#L25-L54); [SaleService.java, dependencies and integration](https://github.com/carloscamelo2008-lang/GameZone-Entropy/blob/f6f35d676e8a29cdddabb28a093a1158175aa266/src/main/java/com/gamezone/service/SaleService.java#L23-L59); [Main.java, lines 30-116](https://github.com/carloscamelo2008-lang/GameZone-Entropy/blob/f6f35d676e8a29cdddabb28a093a1158175aa266/src/main/java/com/gamezone/Main.java#L30-L116).
+
+## 9. Protected Variations
+
+**Verdict: `violation`**
+
+**Finding: `LEAD-GRASP-01`.**
+
+The warranty-eligibility rule is not protected behind a stable capability or policy contract. Instead, both the UI and sale service directly name the concrete `Console` subtype. A predictable change to which product kinds may receive a warranty would require changes in both layers, increasing the chance that the prompt and actual assignment logic diverge.
+
+This pattern assessment refers to the same underlying finding as Pattern 6. It does not create a second correction task.
+
+**Evidence:** [UI.java, lines 400-424](https://github.com/carloscamelo2008-lang/GameZone-Entropy/blob/f6f35d676e8a29cdddabb28a093a1158175aa266/src/main/java/com/gamezone/ui/UI.java#L400-L424); [SaleService.java, lines 147-182](https://github.com/carloscamelo2008-lang/GameZone-Entropy/blob/f6f35d676e8a29cdddabb28a093a1158175aa266/src/main/java/com/gamezone/service/SaleService.java#L147-L182).
+
+## Findings summary
+
+### Design violation to consolidate
+
+| ID | Pattern(s) | Evidence summary | Affected code / correction owner |
+|---|---|---|---|
+| `LEAD-GRASP-01` | Low Coupling, High Cohesion, Polymorphism, Protected Variations | Extended-warranty eligibility is determined by duplicated `instanceof Console` checks in the UI and sale service. | `UI.registerSale()` and `SaleService.registerSale()`; Technical Leader owns both scoped locations. |
+
+The four pattern references above describe one underlying design issue, so they should be consolidated as one correction rather than four duplicate tasks. No application-code correction is made during Phase 1.
