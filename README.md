@@ -265,33 +265,37 @@ Repositories are responsible for file access and serialization.
 ## Project Structure
 
 ```text
-src/main/java/com/gamezone/
-├── exceptions/
-├── model/
-├── persistence/
-├── service/
-├── ui/
-├── validation/
-└── Main.java
-
-docs/
-├── analysis.md
-├── class-diagram.md
-├── hierarchy-diagram.md
-├── layers-diagram.md
-├── accessory-analysis.md
-├── accessory-class-diagram.md
-├── promotion-analysis.md
-├── promotion-class-diagram.md
-├── warranty-analysis.md
-├── warranty-class-diagram.md
-├── return-analysis.md
-├── return-class-diagram.md
-├── integration-analysis.md
-├── integrated-class-diagram.md
-├── exception-analysis.md
-├── exception-class-diagram.md
-└── ai-usage/
+GameZone-Entropy/
+├── src/
+│   └── main/
+│       └── java/
+│           └── com/
+│               └── gamezone/
+│                   ├── exceptions/
+│                   ├── model/
+│                   ├── persistence/
+│                   ├── service/
+│                   ├── ui/
+│                   ├── validation/
+│                   └── Main.java
+└── docs/
+    ├── analysis.md
+    ├── class-diagram.md
+    ├── hierarchy-diagram.md
+    ├── layers-diagram.md
+    ├── accessory-analysis.md
+    ├── accessory-class-diagram.md
+    ├── promotion-analysis.md
+    ├── promotion-class-diagram.md
+    ├── warranty-analysis.md
+    ├── warranty-class-diagram.md
+    ├── return-analysis.md
+    ├── return-class-diagram.md
+    ├── integration-analysis.md
+    ├── integrated-class-diagram.md
+    ├── exception-analysis.md
+    ├── exception-class-diagram.md
+    └── ai-usage/
 ```
 
 ## Documentation
@@ -344,15 +348,25 @@ The service layer invokes these validators before completing the corresponding b
 
 ### Persistence Error Handling
 
-The repositories translate file access failures into `PersistenceException` so that persistence errors can propagate through the service layer instead of being silently ignored.
+The repositories use `PersistenceException` to report relevant file access failures while preserving the original cause when available.
 
-The original cause is preserved where available, allowing the underlying failure to be investigated. Missing data files may be treated as an empty initial data source where the repository supports first-run initialization.
+The following repositories apply this behavior:
+
+- `PersonRepository`
+- `ProductRepository`
+- `SaleRepository`
+- `AccessoryRepository`
+- `PromotionRepository`
+- `ReturnRepository`
+- `WarrantyRepository`
+
+The repositories remain responsible for reading and writing their data, while services allow application-specific exceptions to propagate to the caller.
+
+Missing data files may be treated as an empty initial data source when supported by the repository implementation. An unreadable or corrupted existing file may cause application initialization to fail.
 
 ### User Interface Error Handling
 
 The console user interface handles application-specific exceptions through `GameZoneException` and displays error messages in Spanish. Invalid numeric input is also handled so that an incorrect entry does not unnecessarily terminate the menu.
-
-This approach separates validation and business rules from the user interface while providing clearer error handling across the application.
 
 ## Execution
 

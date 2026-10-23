@@ -1,5 +1,4 @@
-
-# Exception Handling — Class Diagram
+# Exception Handling: Class Diagram
 
 The diagram shows the custom exception hierarchy, the validator classes, and their main relationships with the services, repositories, and console user interface.
 
@@ -64,9 +63,15 @@ classDiagram
     class ProductService
     class PersonService
     class SaleService
+
     class PersonRepository
     class ProductRepository
     class SaleRepository
+    class AccessoryRepository
+    class PromotionRepository
+    class ReturnRepository
+    class WarrantyRepository
+
     class UI
 
     RuntimeException <|-- GameZoneException
@@ -97,6 +102,10 @@ classDiagram
     PersonRepository ..> PersistenceException : reports persistence failures
     ProductRepository ..> PersistenceException : reports persistence failures
     SaleRepository ..> PersistenceException : reports persistence failures
+    AccessoryRepository ..> PersistenceException : reports persistence failures
+    PromotionRepository ..> PersistenceException : reports persistence failures
+    ReturnRepository ..> PersistenceException : reports persistence failures
+    WarrantyRepository ..> PersistenceException : reports persistence failures
 
     UI ..> GameZoneException : catches application errors
 ```
@@ -107,5 +116,5 @@ classDiagram
 - The specialized exceptions distinguish invalid input, business rule violations, missing resources, and persistence failures.
 - The validator classes centralize checks and are used by the corresponding services.
 - `SaleValidator` delegates shared product and person validations instead of duplicating them.
-- The repositories report relevant data access failures through `PersistenceException`.
+- All seven repositories report relevant data access failures through `PersistenceException`.
 - The console UI catches `GameZoneException` and displays Spanish error messages.

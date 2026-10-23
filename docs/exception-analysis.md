@@ -50,7 +50,7 @@ This arrangement keeps the relevant business checks in reusable validator classe
 
 ## 5. Persistence Failures
 
-`PersonRepository`, `ProductRepository`, and `SaleRepository` translate relevant file access failures into `PersistenceException`.
+`PersonRepository`, `ProductRepository`, `SaleRepository`, `AccessoryRepository`, `PromotionRepository`, `ReturnRepository`, and `WarrantyRepository` translate relevant file access failures into `PersistenceException`.
 
 The repositories remain responsible for reading and writing their data, while services allow application-specific exceptions to propagate to the caller. Missing data files may be treated as an empty initial data source when supported by the repository implementation.
 
