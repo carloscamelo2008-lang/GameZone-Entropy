@@ -35,8 +35,8 @@
 - **Evidence & Findings:** See **[V-01]**. `ReturnService` mixes two distinct operational responsibilities: managing return transaction workflows (`registerReturn`, lines 68-138) and handling cross-module sales reporting/aggregation (`calculateMonthlySales`, lines 196-209, and `generateMonthlyBalance`, lines 244-246). Combining transactional processing with cross-domain reporting calculation dilutes class cohesion.
 
 ### 2.6 Polymorphism
-- **Verdict:** `not applicable`
-- **Evidence & Findings:** Within Developer 2's assigned scope (`Person`, `Accessory`, `Promotion`, `Return`, `Warranty` services/repositories), there are no subtype hierarchies or polymorphic variations requiring method dispatch. Polymorphic structures exist in product and warranty entity hierarchies assigned to other developers.
+- **Verdict:** `correct`
+- **Evidence & Findings:** Polymorphic invocation is correctly applied within Developer 2's service operations. In `PromotionService.findBestPromotionFor` (lines 130-138), the method dispatches `promotion.calculateDiscount(sale)` polymorphically across concrete promotion implementations. Similarly, `WarrantyService.cancelWarranties` (lines 159-168) invokes `warranty.getAdditionalCost()` on abstract `Warranty` instances, delegating execution to the specific subtype logic without conditional branching.
 
 ### 2.7 Pure Fabrication
 - **Verdict:** `correct`
@@ -81,4 +81,4 @@
 | ID | Component | GRASP Pattern(s) | Severity | Description | Correction Owner |
 |---|---|---|---|---|---|
 | **V-01** | `ReturnService` | High Cohesion | Medium | Combines return lifecycle processing with cross-module sales reporting and monthly balance math. | Developer 2 (Daniel) |
-| **V-02** | `AccessoryRepository` | Protected Variations | Low | Unguarded `NumberFormatException` in CSV numeric parsing exposes callers to unhandled runtime crashes. | Developer 2 (Daniel) |rded `NumberFormatException` in CSV numeric parsing exposes callers to unhandled runtime crashes. | Developer 2 (Daniel) |
+| **V-02** | `AccessoryRepository` | Protected Variations | Low | Unguarded `NumberFormatException` in CSV numeric parsing exposes callers to unhandled runtime crashes. | Developer 2 (Daniel) |
