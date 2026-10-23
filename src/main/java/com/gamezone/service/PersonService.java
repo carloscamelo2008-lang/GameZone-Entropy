@@ -39,12 +39,22 @@ public class PersonService {
      * @param email email address of the customer
      * @return the newly created Customer
      */
-    public Customer registerCustomer(String id, String name, String phone, String email) {
+   public Customer registerCustomer(String id, String name, String phone, String email) {
+        PersonValidator.validateCustomer(id, name, phone, email);
+        
         PersonValidator.validateCustomerIdAvailable(findCustomerById(id), id);
         Customer customer = new Customer(id, name, phone, email);
         customers.add(customer);
         personRepository.saveCustomers(customers);
         return customer;
+    }
+
+    public Seller registerSeller(String id, String name, String phone, String employeeCode, String shift) {
+        PersonValidator.validateSeller(id, name, phone, employeeCode, shift);
+        Seller seller = new Seller(id, name, phone, employeeCode, shift);
+        sellers.add(seller);
+        personRepository.saveSellers(sellers);
+        return seller;
     }
 
     /**

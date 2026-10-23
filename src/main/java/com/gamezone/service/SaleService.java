@@ -134,6 +134,8 @@ public class SaleService {
         Map<String, Integer> extendedWarrantyQuantities = new HashMap<>();
 
         if (productIdsWithExtendedWarranty != null) {
+            SaleValidator.validateExtendedWarranties(productIdsWithExtendedWarranty, productIds);
+
             for (String productId : productIdsWithExtendedWarranty) {
                 extendedWarrantyQuantities.put(
                         productId,

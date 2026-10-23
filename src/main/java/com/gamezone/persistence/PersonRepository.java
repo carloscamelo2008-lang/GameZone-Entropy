@@ -42,6 +42,9 @@ public class PersonRepository {
             for (Customer c : customers) {
                 writer.println(String.join(",", c.getId(), c.getName(), c.getPhone(), c.getEmail()));
             }
+            if (writer.checkError()) {
+                throw new PersistenceException("Error de escritura en el archivo de clientes: " + customersFilePath);
+            }
         } catch (IOException e) {
             throw new PersistenceException("Error al escribir el archivo de clientes: " + customersFilePath, e);
         }
@@ -90,6 +93,9 @@ public class PersonRepository {
             for (Seller s : sellers) {
                 writer.println(String.join(",", s.getId(), s.getName(), s.getPhone(),
                         s.getEmployeeCode(), s.getShift()));
+            }
+            if (writer.checkError()) {
+                throw new PersistenceException("Error de escritura en el archivo de vendedores: " + sellersFilePath);
             }
         } catch (IOException e) {
             throw new PersistenceException("Error al escribir el archivo de vendedores: " + sellersFilePath, e);
