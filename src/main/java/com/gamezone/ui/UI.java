@@ -11,6 +11,7 @@ import java.util.Scanner;
 import com.gamezone.model.Accessory;
 import com.gamezone.service.AccessoryService;
 import com.gamezone.service.ReturnService;
+import com.gamezone.exceptions.GameZoneException;
 
 /**
  * Provides the console-based user interface for GameZone.
@@ -50,6 +51,9 @@ public class UI {
     /**
      * Starts the console user interface.
      */
+    /**
+     * Starts the console user interface.
+     */
     public void start() {
         boolean running = true;
 
@@ -58,52 +62,72 @@ public class UI {
 
             String option = scanner.nextLine();
 
-            switch (option) {
-                case "0":
-                    running = false;
-                    System.out.println("Goodbye!");
-                    break;
-                case "1":
-                    registerVideoGame();
-                    break;
+            try {
+                switch (option) {
+                    case "0":
+                        running = false;
+                        System.out.println("Goodbye!");
+                        break;
 
-                case "2":
-                    registerConsole();
-                    break;
+                    case "1":
+                        registerVideoGame();
+                        break;
 
-                case "3":
-                    listProducts();
-                    break;
-                case "4":
-                    registerCustomer();
-                    break;
-                case "5":
-                    listCustomers();
-                    break;
-                case "6":
-                    listSellers();
-                    break;
-                case "7":
-                    registerSale();
-                    break;
-                case "8":
-                    listAllSales();
-                    break;
-                case "9":
-                    listCustomerSales();
-                    break;
-                case "10":
-                    listSellerSales();
-                    break;
-                case "11":
-                    manageAccessories();
-                    break;
-                case "12":
-                    showMonthlyBalance();
-                    break;
-                default:
-                    System.out.println("Opción no válida. Intente nuevamente.");
-                    break;
+                    case "2":
+                        registerConsole();
+                        break;
+
+                    case "3":
+                        listProducts();
+                        break;
+
+                    case "4":
+                        registerCustomer();
+                        break;
+
+                    case "5":
+                        listCustomers();
+                        break;
+
+                    case "6":
+                        listSellers();
+                        break;
+
+                    case "7":
+                        registerSale();
+                        break;
+
+                    case "8":
+                        listAllSales();
+                        break;
+
+                    case "9":
+                        listCustomerSales();
+                        break;
+
+                    case "10":
+                        listSellerSales();
+                        break;
+
+                    case "11":
+                        manageAccessories();
+                        break;
+
+                    case "12":
+                        showMonthlyBalance();
+                        break;
+
+                    default:
+                        System.out.println(
+                                "Opción no válida. Intente nuevamente."
+                        );
+                        break;
+                }
+            } catch (NumberFormatException e) {
+                System.out.println(
+                        "Entrada numérica inválida. "
+                                + "Ingrese un número válido e inténtelo de nuevo."
+                );
             }
         }
     }
@@ -168,7 +192,7 @@ public class UI {
             );
 
             System.out.println("Videojuego registrado correctamente.");
-        } catch (Exception e) {
+        } catch (GameZoneException e) {
             System.out.println("Error al registrar el videojuego: " + e.getMessage());
         }
     }
@@ -211,7 +235,7 @@ public class UI {
             );
 
             System.out.println("Consola registrada correctamente.");
-        } catch (Exception e) {
+        } catch (GameZoneException e) {
             System.out.println("Error al registrar la consola: " + e.getMessage());
         }
     }
@@ -237,7 +261,7 @@ public class UI {
                                 + " | Stock: " + product.getStock()
                 );
             }
-        } catch (Exception e) {
+        } catch (GameZoneException e) {
             System.out.println("Error al listar los productos: " + e.getMessage());
         }
     }
@@ -280,7 +304,7 @@ public class UI {
         try {
             personService.registerCustomer(id, name, phone, email);
             System.out.println("Cliente registrado correctamente.");
-        } catch (Exception e) {
+        } catch (GameZoneException e) {
             System.out.println("Error al registrar el cliente: " + e.getMessage());
         }
     }
@@ -381,7 +405,7 @@ public class UI {
             System.out.println();
             System.out.println(sale.generateReceipt());
 
-        } catch (Exception e) {
+        } catch (GameZoneException e) {
             System.out.println(
                     "Error al registrar la venta: " + e.getMessage()
             );
@@ -420,7 +444,7 @@ public class UI {
 
                 System.out.println();
             }
-        } catch (Exception e) {
+        } catch (GameZoneException e) {
             System.out.println(
                     "Error al listar el historial de ventas: " + e.getMessage()
             );
@@ -462,7 +486,7 @@ public class UI {
 
                 System.out.println();
             }
-        } catch (Exception e) {
+        } catch (GameZoneException e) {
             System.out.println(
                     "Error al consultar el historial del cliente: "
                             + e.getMessage()
@@ -505,7 +529,7 @@ public class UI {
 
                 System.out.println();
             }
-        } catch (Exception e) {
+        } catch (GameZoneException e) {
             System.out.println(
                     "Error al consultar el historial del vendedor: "
                             + e.getMessage()
@@ -598,7 +622,7 @@ public class UI {
             );
 
             System.out.println("Controlador registrado correctamente.");
-        } catch (Exception e) {
+        } catch (GameZoneException e) {
             System.out.println(
                     "Error al registrar el controlador: " + e.getMessage()
             );
@@ -643,7 +667,7 @@ public class UI {
             );
 
             System.out.println("Cable registrado correctamente.");
-        } catch (Exception e) {
+        } catch (GameZoneException e) {
             System.out.println(
                     "Error al registrar el cable: " + e.getMessage()
             );
@@ -688,7 +712,7 @@ public class UI {
             );
 
             System.out.println("Memoria registrada correctamente.");
-        } catch (Exception e) {
+        } catch (GameZoneException e) {
             System.out.println(
                     "Error al registrar la memoria: " + e.getMessage()
             );
@@ -711,7 +735,7 @@ public class UI {
             for (Accessory accessory : accessories) {
                 System.out.println(accessory.getDescription());
             }
-        } catch (Exception e) {
+        } catch (GameZoneException e) {
             System.out.println(
                     "Error al listar los accesorios: " + e.getMessage()
             );
@@ -738,7 +762,7 @@ public class UI {
             for (Accessory accessory : accessories) {
                 System.out.println(accessory.getDescription());
             }
-        } catch (Exception e) {
+        } catch (GameZoneException e) {
             System.out.println(
                     "Error al filtrar los accesorios: " + e.getMessage()
             );
@@ -767,7 +791,7 @@ public class UI {
             for (Accessory accessory : accessories) {
                 System.out.println(accessory.getDescription());
             }
-        } catch (Exception e) {
+        } catch (GameZoneException e) {
             System.out.println(
                     "Error al consultar compatibilidad: " + e.getMessage()
             );
@@ -794,7 +818,7 @@ public class UI {
             System.out.println(
                     "Consola compatible asignada correctamente."
             );
-        } catch (Exception e) {
+        } catch (GameZoneException e) {
             System.out.println(
                     "Error al asignar la consola compatible: "
                             + e.getMessage()
@@ -822,7 +846,7 @@ public class UI {
             System.out.println("Total de devoluciones: $" + monthlyReturns);
             System.out.println("Balance neto: $" + monthlyBalance);
 
-        } catch (Exception e) {
+        } catch (GameZoneException e) {
             System.out.println("Error al generar el balance mensual: " + e.getMessage());
         }
     }
