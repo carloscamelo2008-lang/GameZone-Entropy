@@ -261,14 +261,27 @@ accepted.
 - **Decision:** I created and reviewed both Markdown files in IntelliJ, updated the README, checked the staged changes with `git diff --cached --check`, and committed the documentation changes.
 - **Related commit:** `6e798f9` - `docs: add exception analysis and class diagram`
 
+### 21. Requirement 6 - Startup Exception Handling
+
+- **Date:** 2026-10-22
+- **Tool:** ChatGPT
+- **Phase and branch:** Requirement 6 · `feature/req6-ui-exceptions`
+- **Objective:** Handle typed persistence and domain errors that may occur while initializing the application.
+- **Query:** Asked how to handle `GameZoneException` during repository and service initialization in `Main.java` and when starting the UI.
+- **Response:** The guidance recommended wrapping application initialization and `ui.start()` in a `try-catch` block for `GameZoneException`, then displaying a readable startup error instead of allowing that typed exception to go unhandled.
+- **Decision:** I applied the change in IntelliJ and ran Maven's `test` goal. Maven reported `BUILD SUCCESS`, but no automated tests were available to run.
+- **Related commit:** `ef9e990` - `fix: handle persistence errors during startup`
+
 
 ## General Conclusion
 
-Throughout Requirement 5 and the initial work on Requirement 6, I used ChatGPT mainly as a technical tutor, code reviewer, Git guide, Pull Request reviewer, and documentation reviewer.
+Throughout Requirement 5 and Requirement 6, I used ChatGPT mainly as a
+technical tutor, code reviewer, Git guide, Pull Request reviewer, and
+documentation reviewer.
 
 I wrote and modified the project files in IntelliJ, executed Git and Maven
-commands myself, performed the required tests, and made the final decisions
-about which suggestions to accept or reject.
+commands myself, performed the available verification checks, and made the
+final decisions about which suggestions to accept or reject.
 
 The most significant uses of AI were related to:
 
@@ -282,7 +295,11 @@ The most significant uses of AI were related to:
 - reviewing the team's AI usage logs against the integration requirement;
 - synchronizing the documentation branch with the updated `develop` branch;
 - adapting the console UI to typed exceptions and documenting validation;
+- documenting the exception hierarchy and class diagram;
+- handling typed exceptions during application startup.
 
 The final decisions were based on the actual repository state, the
-integration requirement, compiler results, application tests, Pull Request
-reviews, and the team's documented responsibilities.
+integration requirement, compiler results, available verification checks,
+Pull Request reviews, and the team's documented responsibilities.
+
+Maven reported `BUILD SUCCESS`, but no automated tests were available to run.
