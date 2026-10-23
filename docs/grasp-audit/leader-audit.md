@@ -156,3 +156,19 @@ Within `SaleService.registerSale()`, warranty records are persisted through `War
 - The two observations listed outside scope remain unchanged.
 - This is the **individual leader audit**, not the team's consolidated audit. The consolidated report must wait for the Developer 1 and Developer 2 audit reports, then validate evidence, merge duplicate/cross-boundary findings, and assign final correction owners.
 - This phase changes documentation only. Runtime behavior and application code have not been refactored.
+
+
+## Verdict matrix for consolidation
+
+| GRASP pattern | Verdict | Finding reference |
+|---|---|---|
+| Information Expert | `correct` | No separate violation identified in this scope. |
+| Creator | `correct` | No separate violation identified in this scope. |
+| Controller | `correct` | No separate violation identified in this scope. |
+| Low Coupling | `violation` | `LEAD-GRASP-01` |
+| High Cohesion | `violation` | `LEAD-GRASP-01` |
+| Polymorphism | `violation` | `LEAD-GRASP-01` |
+| Pure Fabrication | `correct` | No separate violation identified in this scope. |
+| Indirection | `correct` | No separate violation identified in this scope. |
+| Protected Variations | `violation` | `LEAD-GRASP-01` |
+
