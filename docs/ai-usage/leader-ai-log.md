@@ -250,6 +250,18 @@ accepted.
     - `d1a746a` - `fix: handle typed exceptions in console UI`
     - `39b5775` - `docs: document exception handling and validation`
 
+### 20. Requirement 6 - Exception Documentation
+
+- **Date:** 2026-10-22
+- **Tool:** ChatGPT
+- **Phase and branch:** Requirement 6 · `feature/req6-ui-exceptions`
+- **Objective:** Complete the exception handling documentation and align the README with the actual project structure.
+- **Query:** Asked for guidance on documenting the exception hierarchy, validator responsibilities, persistence failures, and relationships between exceptions, validators, services, repositories, and the console UI.
+- **Response:** ChatGPT provided drafts for `docs/exception-analysis.md` and `docs/exception-class-diagram.md`, and guidance for updating the README project structure and documentation index.
+- **Decision:** I created and reviewed both Markdown files in IntelliJ, updated the README, checked the staged changes with `git diff --cached --check`, and committed the documentation changes.
+- **Related commit:** `6e798f9` - `docs: add exception analysis and class diagram`
+
+
 ## General Conclusion
 
 Throughout Requirement 5 and the initial work on Requirement 6, I used ChatGPT mainly as a technical tutor, code reviewer, Git guide, Pull Request reviewer, and documentation reviewer.
