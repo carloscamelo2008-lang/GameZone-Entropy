@@ -9,14 +9,33 @@
 
 ### Classes and methods in scope
 
-1. `Sale`: sale state, promotion fields, subtotal/final-total calculations, and receipt generation. **`canBeReturned()` is excluded** because the Requirement 7 responsibility map assigns that method to Developer 1.
-2. `SaleRepository`: `saveAll()` and `loadAll()`.
-3. `SaleService`: `registerSale()`, item lookup, sale queries, and integration with products, accessories, promotions, warranties, and persistence.
-4. `UI.java` (the console-menu implementation named `ConsoleMenu` in the requirement): menu routing, sale flow, module interactions, and typed exception handling.
-5. `Main`: application wiring and startup.
-6. `ProductService.restoreStock()`.
+The scope is organized by the module/requirement that introduced or extended the responsibility. The actual repository class is `UI.java`; this is the console-menu implementation called `ConsoleMenu` in the requirement.
 
-The audit covers the nine GRASP patterns named in the requirement. Each verdict is based on the scoped source code. Potential functional defects are recorded separately because Requirement 7 says not to change behavior during the audit phase.
+- **Workshop 1 - Sales and application startup**
+  - `Sale`: state, promotion fields as currently implemented, subtotal/final-total calculations, and receipt generation.
+  - `SaleRepository`: `saveAll()` and `loadAll()`.
+  - `SaleService`: constructor, `registerSale()`, item lookup, and sale-query methods.
+  - `Main.main()`: application wiring and startup.
+- **Requirement 1 - Accessories**
+  - `SaleService.registerSale()`: accessory lookup and accessory stock updates.
+  - `UI.manageAccessories()` and related menu handlers: console integration with accessory operations.
+- **Requirement 2 - Promotions**
+  - `Sale`: promotion name and discount fields, total calculations, and receipt breakdown.
+  - `SaleService.registerSale()`: promotion selection and applied discount.
+  - `UI.registerSale()` and sales-history handlers: sale presentation.
+- **Requirement 3 - Returns**
+  - `ProductService.restoreStock()`: product stock restoration integration.
+  - `UI.showMonthlyBalance()`: monthly balance menu integration.
+  - **`Sale.canBeReturned()` is excluded** because the responsibility map assigns that method to Developer 1.
+- **Requirement 4 - Warranties**
+  - `SaleService.registerSale()`: basic/extended warranty assignment and extended-warranty cost.
+  - `UI.registerSale()`: console prompt for an extended warranty.
+  - `Main.main()`: wiring of warranty-related dependencies.
+- **Requirement 6 - Exceptions and validation**
+  - `UI.start()` and operation handlers: menu routing and differentiated handling of typed exceptions.
+  - `Main.main()`: handling a typed application exception during startup.
+
+The audit covers the nine GRASP patterns named in the requirement. Each verdict is based on the scoped source code at the stated `develop` baseline. Potential functional defects are recorded separately because Requirement 7 says not to change behavior during the audit phase.
 
 ## 1. Information Expert
 
@@ -54,7 +73,7 @@ The audit covers the nine GRASP patterns named in the requirement. Each verdict 
 
 **Verdict: `violation`**
 
-**Finding: `LEAD-GRASP-01` (shared with Patterns 5, 6, and 9).**
+**Finding: `V-01` (shared with Patterns 5, 6, and 9).**
 
 The avoidable coupling is concentrated in the console sale interaction. `UI.registerSale()` queries `ProductService.listAllProducts()`, inspects each concrete product as a `Console`, and uses that type check to decide whether to prompt for an extended warranty. `SaleService.registerSale()` independently performs another `instanceof Console` check before assigning warranties. This makes the UI depend on a concrete domain subtype and duplicates a rule that affects the sale workflow.
 
@@ -66,7 +85,7 @@ The existence of multiple collaborators in `SaleService` is not treated as a vio
 
 **Verdict: `violation`**
 
-**Finding: `LEAD-GRASP-01`.**
+**Finding: `V-01`.**
 
 The console UI's main role is to gather input, route commands, and display results. However, `UI.registerSale()` also retrieves inventory records and decides warranty eligibility by checking the product's concrete type. That policy-level decision overlaps with the same decision inside `SaleService.registerSale()`. The issue is not that one console menu exposes several application operations; it is that this sale handler mixes presentation with domain-type policy and duplicates the service's decision.
 
@@ -76,7 +95,7 @@ The console UI's main role is to gather input, route commands, and display resul
 
 **Verdict: `violation`**
 
-**Finding: `LEAD-GRASP-01`.**
+**Finding: `V-01`.**
 
 The workflow selects warranty behavior with explicit type checks:
 
@@ -106,7 +125,7 @@ This is behavior that varies by product subtype, but the variation is encoded as
 - `SaleService` collaborates with `ProductService`, `AccessoryService`, `PersonService`, `PromotionService`, and `WarrantyService` for each module's operations, while sale persistence is delegated to `SaleRepository`.
 - `Main` centralizes object construction and dependency wiring; the UI does not construct repositories or open data files itself.
 
-This provides service and repository intermediaries between the console and persistence. The concrete subtype check in `LEAD-GRASP-01` is captured under Low Coupling, High Cohesion, Polymorphism, and Protected Variations, not treated as a separate failure of Indirection.
+This provides service and repository intermediaries between the console and persistence. The concrete subtype check in `V-01` is captured under Low Coupling, High Cohesion, Polymorphism, and Protected Variations, not treated as a separate failure of Indirection.
 
 **Evidence:** [UI.java, constructor and fields](https://github.com/carloscamelo2008-lang/GameZone-Entropy/blob/f6f35d676e8a29cdddabb28a093a1158175aa266/src/main/java/com/gamezone/ui/UI.java#L25-L54); [SaleService.java, dependencies and integration](https://github.com/carloscamelo2008-lang/GameZone-Entropy/blob/f6f35d676e8a29cdddabb28a093a1158175aa266/src/main/java/com/gamezone/service/SaleService.java#L23-L59); [Main.java, lines 30-116](https://github.com/carloscamelo2008-lang/GameZone-Entropy/blob/f6f35d676e8a29cdddabb28a093a1158175aa266/src/main/java/com/gamezone/Main.java#L30-L116).
 
@@ -114,7 +133,7 @@ This provides service and repository intermediaries between the console and pers
 
 **Verdict: `violation`**
 
-**Finding: `LEAD-GRASP-01`.**
+**Finding: `V-01`.**
 
 The warranty-eligibility rule is not protected behind a stable capability or policy contract. Instead, both the UI and sale service directly name the concrete `Console` subtype. A predictable change to which product kinds may receive a warranty would require changes in both layers, increasing the chance that the prompt and actual assignment logic diverge.
 
@@ -124,13 +143,20 @@ This pattern assessment refers to the same underlying finding as Pattern 6. It d
 
 ## Findings summary
 
-### Design violation to consolidate
+### Detailed finding record
 
-| ID | Pattern(s) | Evidence summary | Affected code / correction owner |
-|---|---|---|---|
-| `LEAD-GRASP-01` | Low Coupling, High Cohesion, Polymorphism, Protected Variations | Extended-warranty eligibility is determined by duplicated `instanceof Console` checks in the UI and sale service. | `UI.registerSale()` and `SaleService.registerSale()`; Technical Leader owns both scoped locations. |
+#### `V-01` - Duplicated concrete-type decision for extended-warranty eligibility
 
-The four pattern references above describe one underlying design issue, so they should be consolidated as one correction rather than four duplicate tasks. No application-code correction is made during Phase 1.
+- **Pattern(s):** Low Coupling; High Cohesion; Polymorphism; Protected Variations.
+- **Module / requirement:** Sales and UI integration, spanning Workshop 1 and the accessory/promotion/warranty integrations (Requirements 1, 2, and 4).
+- **Evidence:** `UI.registerSale()` checks `product instanceof Console` before prompting for an extended warranty ([UI.java, lines 400-424](https://github.com/carloscamelo2008-lang/GameZone-Entropy/blob/f6f35d676e8a29cdddabb28a093a1158175aa266/src/main/java/com/gamezone/ui/UI.java#L400-L424)). `SaleService.registerSale()` separately checks `product instanceof Console` before assigning basic and optional extended warranties ([SaleService.java, lines 147-182](https://github.com/carloscamelo2008-lang/GameZone-Entropy/blob/f6f35d676e8a29cdddabb28a093a1158175aa266/src/main/java/com/gamezone/service/SaleService.java#L147-L182)).
+- **Explanation:** The UI repeats a concrete product-type decision that also exists in the service. This introduces avoidable dependency on the concrete subtype and spreads one warranty-eligibility rule across two layers.
+- **Consequence:** If warranty eligibility changes for another product type, or the rule changes, both locations would require synchronized edits. The console prompt and the business assignment logic could drift apart.
+- **Proposed design solution:** Centralize the warranty-eligibility policy behind one stable operation or abstraction and have the UI ask the service/policy whether the prompt applies, instead of checking `Console` directly. Keep warranty creation and business validation in the service layer. The concrete refactoring choice must be confirmed in Phase 2 after consolidating the team's reports.
+- **Code owned by another member:** No for the two cited locations. Both are in the Technical Leader's assigned scope for this report.
+- **Correction owner:** Technical Leader, subject to final confirmation in the consolidated audit.
+
+The four pattern references describe one underlying design issue, so they should be consolidated as one correction rather than four duplicate tasks. No application-code correction is made during Phase 1.
 
 
 ## Findings outside the GRASP refactor scope
@@ -152,7 +178,7 @@ Within `SaleService.registerSale()`, warranty records are persisted through `War
 ## Audit completion and limitations
 
 - All nine required GRASP patterns have a verdict for the scoped leader code.
-- One underlying design finding, `LEAD-GRASP-01`, is cross-referenced under four patterns so it can be consolidated and corrected only once.
+- One underlying design finding, `V-01`, is cross-referenced under four patterns so it can be consolidated and corrected only once.
 - The two observations listed outside scope remain unchanged.
 - This is the **individual leader audit**, not the team's consolidated audit. The consolidated report must wait for the Developer 1 and Developer 2 audit reports, then validate evidence, merge duplicate/cross-boundary findings, and assign final correction owners.
 - This phase changes documentation only. Runtime behavior and application code have not been refactored.
@@ -165,10 +191,10 @@ Within `SaleService.registerSale()`, warranty records are persisted through `War
 | Information Expert | `correct` | No separate violation identified in this scope. |
 | Creator | `correct` | No separate violation identified in this scope. |
 | Controller | `correct` | No separate violation identified in this scope. |
-| Low Coupling | `violation` | `LEAD-GRASP-01` |
-| High Cohesion | `violation` | `LEAD-GRASP-01` |
-| Polymorphism | `violation` | `LEAD-GRASP-01` |
+| Low Coupling | `violation` | `V-01` |
+| High Cohesion | `violation` | `V-01` |
+| Polymorphism | `violation` | `V-01` |
 | Pure Fabrication | `correct` | No separate violation identified in this scope. |
 | Indirection | `correct` | No separate violation identified in this scope. |
-| Protected Variations | `violation` | `LEAD-GRASP-01` |
+| Protected Variations | `violation` | `V-01` |
 
