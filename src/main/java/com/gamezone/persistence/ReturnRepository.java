@@ -37,9 +37,9 @@ public class ReturnRepository {
     /**
      * Creates a return repository backed by the given CSV file.
      *
-     * @param filePath        path to the CSV file used for persistence
-     * @param saleRepository  repository used to resolve sale references on load
-     * @param productService  service used to resolve product references on load
+     * @param filePath         path to the CSV file used for persistence
+     * @param saleRepository   repository used to resolve sale references on load
+     * @param productService   service used to resolve product references on load
      * @param accessoryService service used to resolve accessory references on load
      */
     public ReturnRepository(String filePath, SaleRepository saleRepository, ProductService productService,
@@ -62,7 +62,7 @@ public class ReturnRepository {
                 writer.println(toCsvLine(aReturn));
             }
         } catch (IOException e) {
-            System.out.println("Error saving returns: " + e.getMessage());
+            throw new PersistenceException("Error saving returns: " + e.getMessage(), e);
         }
     }
 
@@ -95,7 +95,7 @@ public class ReturnRepository {
                 }
             }
         } catch (IOException e) {
-            System.out.println("Error loading returns: " + e.getMessage());
+            throw new PersistenceException("Error loading returns: " + e.getMessage(), e);
         }
 
         return returns;

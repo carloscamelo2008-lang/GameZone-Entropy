@@ -52,7 +52,7 @@ public class PromotionRepository {
                 }
             }
         } catch (IOException e) {
-            System.out.println("Error saving promotions: " + e.getMessage());
+            throw new PersistenceException("Error saving promotions: " + e.getMessage(), e);
         }
     }
 
@@ -82,7 +82,7 @@ public class PromotionRepository {
                 }
             }
         } catch (IOException e) {
-            System.out.println("Error loading promotions: " + e.getMessage());
+            throw new PersistenceException("Error loading promotions: " + e.getMessage(), e);
         }
 
         return promotions;

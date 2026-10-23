@@ -48,7 +48,7 @@ public class WarrantyRepository {
                 writer.println(toCsvLine(warranty));
             }
         } catch (IOException e) {
-            System.out.println("Error saving warranties: " + e.getMessage());
+            throw new PersistenceException("Error saving warranties: " + e.getMessage(), e);
         }
     }
 
@@ -78,7 +78,7 @@ public class WarrantyRepository {
                 records.add(fromCsvLine(line));
             }
         } catch (IOException e) {
-            System.out.println("Error loading warranties: " + e.getMessage());
+            throw new PersistenceException("Error loading warranties: " + e.getMessage(), e);
         }
 
         return records;

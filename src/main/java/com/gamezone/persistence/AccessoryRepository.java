@@ -49,7 +49,7 @@ public class AccessoryRepository {
                 }
             }
         } catch (IOException e) {
-            System.out.println("Error saving accessories: " + e.getMessage());
+            throw new PersistenceException("Error saving accessories: " + e.getMessage(), e);
         }
     }
 
@@ -79,7 +79,7 @@ public class AccessoryRepository {
                 }
             }
         } catch (IOException e) {
-            System.out.println("Error loading accessories: " + e.getMessage());
+            throw new PersistenceException("Error loading accessories: " + e.getMessage(), e);
         }
 
         return accessories;

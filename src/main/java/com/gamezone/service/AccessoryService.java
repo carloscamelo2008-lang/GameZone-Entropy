@@ -164,13 +164,13 @@ public class AccessoryService {
         Accessory accessory = findById(accessoryId);
 
         if (accessory == null) {
-            throw new IllegalArgumentException(
+            throw new ResourceNotFoundException(
                     "Accessory not found: " + accessoryId
             );
         }
 
         if (consoleId == null || consoleId.isBlank()) {
-            throw new IllegalArgumentException(
+            throw new ValidationException(
                     "Console ID cannot be empty."
             );
         }
