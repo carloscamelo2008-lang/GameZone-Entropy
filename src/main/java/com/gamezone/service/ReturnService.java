@@ -66,11 +66,11 @@ public class ReturnService {
     public Return registerReturn(String saleId, List<String> productIds, String reason) {
         Sale sale = findSaleByReference(saleId);
         if (sale == null) {
-            throw new IllegalArgumentException("La venta indicada no existe.");
+            throw new ResourceNotFoundException("La venta indicada no existe.");
         }
 
         if (!sale.canBeReturned()) {
-            throw new ResourceNotFoundException
+            throw new BusinessRuleException
                     ("No se puede registrar la devolución: han pasado más de 30 días desde la venta.");
         }
 
@@ -193,7 +193,7 @@ public class ReturnService {
      */
     public double calculateMonthlySales(int month, int year) {
         if (month < 1 || month > 12) {
-            throw new IllegalArgumentException("El mes debe estar entre 1 y 12.");
+            throw new InvalidDataException("El mes debe estar entre 1 y 12.");
         }
 
         double totalSales = 0;
@@ -217,7 +217,7 @@ public class ReturnService {
      */
     public double calculateMonthlyReturns(int month, int year) {
         if (month < 1 || month > 12) {
-            throw new IllegalArgumentException("El mes debe estar entre 1 y 12.");
+            throw new InvalidDataException("El mes debe estar entre 1 y 12.");
         }
 
         double totalReturns = 0;
