@@ -5,7 +5,8 @@ import com.gamezone.model.Cable;
 import com.gamezone.model.Controller;
 import com.gamezone.model.Memory;
 import com.gamezone.persistence.AccessoryRepository;
-
+import com.gamezone.exceptions.InvalidDataException;
+import com.gamezone.exceptions.ResourceNotFoundException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -164,15 +165,11 @@ public class AccessoryService {
         Accessory accessory = findById(accessoryId);
 
         if (accessory == null) {
-            throw new IllegalArgumentException(
-                    "Accessory not found: " + accessoryId
-            );
+            throw new ResourceNotFoundException("Accessory not found: " + accessoryId);
         }
 
         if (consoleId == null || consoleId.isBlank()) {
-            throw new IllegalArgumentException(
-                    "Console ID cannot be empty."
-            );
+            throw new InvalidDataException("Console ID cannot be empty.");
         }
 
         if (!accessory.getCompatibleConsoleIds().contains(consoleId)) {
