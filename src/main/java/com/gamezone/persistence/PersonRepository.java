@@ -2,7 +2,7 @@ package com.gamezone.persistence;
 
 import com.gamezone.model.Customer;
 import com.gamezone.model.Seller;
-
+import com.gamezone.exceptions.PersistenceException;
 import java.io.*;
 import java.util.ArrayList;
 import java.util.List;
@@ -30,27 +30,32 @@ public class PersonRepository {
         this.sellersFilePath = sellersFilePath;
     }
 
-    /**
+      /**
      * Saves the given list of customers to the customers data file,
      * overwriting any previous content.
      *
      * @param customers the list of customers to persist
+     * @throws PersistenceException if the customers file cannot be written
      */
     public void saveCustomers(List<Customer> customers) {
         try (PrintWriter writer = new PrintWriter(new FileWriter(customersFilePath))) {
             for (Customer c : customers) {
                 writer.println(String.join(",", c.getId(), c.getName(), c.getPhone(), c.getEmail()));
             }
+            if (writer.checkError()) {
+                throw new PersistenceException("Error de escritura en el archivo de clientes: " + customersFilePath);
+            }
         } catch (IOException e) {
-            System.out.println("Error saving customers: " + e.getMessage());
+            throw new PersistenceException("Error al escribir el archivo de clientes: " + customersFilePath, e);
         }
     }
 
-    /**
+        /**
      * Loads the list of customers from the customers data file.
      * Returns an empty list if the file does not exist yet.
      *
      * @return the list of customers read from the file
+     * @throws PersistenceException if the customers file cannot be read
      */
     public List<Customer> loadCustomers() {
         List<Customer> customers = new ArrayList<>();
@@ -71,16 +76,17 @@ public class PersonRepository {
                 customers.add(new Customer(parts[0], parts[1], parts[2], parts[3]));
             }
         } catch (IOException e) {
-            System.out.println("Error loading customers: " + e.getMessage());
+            throw new PersistenceException("Error al leer el archivo de clientes: " + customersFilePath, e);
         }
         return customers;
     }
 
-    /**
+       /**
      * Saves the given list of sellers to the sellers data file,
      * overwriting any previous content.
      *
      * @param sellers the list of sellers to persist
+     * @throws PersistenceException if the sellers file cannot be written
      */
     public void saveSellers(List<Seller> sellers) {
         try (PrintWriter writer = new PrintWriter(new FileWriter(sellersFilePath))) {
@@ -88,16 +94,20 @@ public class PersonRepository {
                 writer.println(String.join(",", s.getId(), s.getName(), s.getPhone(),
                         s.getEmployeeCode(), s.getShift()));
             }
+            if (writer.checkError()) {
+                throw new PersistenceException("Error de escritura en el archivo de vendedores: " + sellersFilePath);
+            }
         } catch (IOException e) {
-            System.out.println("Error saving sellers: " + e.getMessage());
+            throw new PersistenceException("Error al escribir el archivo de vendedores: " + sellersFilePath, e);
         }
     }
 
-    /**
+       /**
      * Loads the list of sellers from the sellers data file.
      * Returns an empty list if the file does not exist yet.
      *
      * @return the list of sellers read from the file
+     * @throws PersistenceException if the sellers file cannot be read
      */
     public List<Seller> loadSellers() {
         List<Seller> sellers = new ArrayList<>();
@@ -116,7 +126,7 @@ public class PersonRepository {
                 sellers.add(new Seller(parts[0], parts[1], parts[2], parts[3], parts[4]));
             }
         } catch (IOException e) {
-            System.out.println("Error loading sellers: " + e.getMessage());
+            throw new PersistenceException("Error al leer el archivo de vendedores: " + sellersFilePath, e);
         }
         return sellers;
     }

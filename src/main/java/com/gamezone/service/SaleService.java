@@ -9,6 +9,7 @@ import com.gamezone.model.Promotion;
 import com.gamezone.model.Sale;
 import com.gamezone.model.Seller;
 import com.gamezone.persistence.SaleRepository;
+import com.gamezone.validation.SaleValidator;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -67,8 +68,12 @@ public class SaleService {
      * @param productIdsWithExtendedWarranty the ids of products that must
      *                                      receive an extended warranty
      * @return the newly created sale
-     * @throws IllegalArgumentException if the customer, seller, or products
-     *                                  are invalid or stock is insufficient
+     * @throws com.gamezone.exceptions.InvalidDataException if the list of
+     *         product ids is empty or contains empty ids
+     * @throws com.gamezone.exceptions.ResourceNotFoundException if the
+     *         customer, the seller, or an item does not exist
+     * @throws com.gamezone.exceptions.BusinessRuleException if the stock
+     *         of an item is insufficient
      */
     public Sale registerSale(
             String customerId,
@@ -76,23 +81,13 @@ public class SaleService {
             List<String> productIds,
             List<String> productIdsWithExtendedWarranty) {
 
-        if (productIds == null || productIds.isEmpty()) {
-            throw new IllegalArgumentException(
-                    "A sale must contain at least one product."
-            );
-        }
+        SaleValidator.validateProductIds(productIds);
 
         Customer customer = personService.findCustomerById(customerId);
-
-        if (customer == null) {
-            throw new IllegalArgumentException("Customer not found.");
-        }
+        SaleValidator.validateCustomerExists(customer, customerId);
 
         Seller seller = personService.findSellerById(sellerId);
-
-        if (seller == null) {
-            throw new IllegalArgumentException("Seller not found.");
-        }
+        SaleValidator.validateSellerExists(seller, sellerId);
 
         Map<String, Integer> quantities = new HashMap<>();
 
@@ -111,27 +106,8 @@ public class SaleService {
             int quantity = entry.getValue();
 
             Product product = findItemById(productId);
-
-            if (product == null) {
-                throw new IllegalArgumentException(
-                        "Product or accessory not found: " + productId
-                );
-            }
-
-            boolean sufficientStock;
-
-            if (product instanceof Accessory) {
-                sufficientStock = product.getStock() >= quantity;
-            } else {
-                sufficientStock =
-                        productService.hasSufficientStock(productId, quantity);
-            }
-
-            if (!sufficientStock) {
-                throw new IllegalArgumentException(
-                        "Insufficient stock for item: " + productId
-                );
-            }
+            SaleValidator.validateProductExists(product, productId);
+            SaleValidator.validateStock(product, quantity);
 
             for (int i = 0; i < quantity; i++) {
                 products.add(product);
@@ -158,6 +134,8 @@ public class SaleService {
         Map<String, Integer> extendedWarrantyQuantities = new HashMap<>();
 
         if (productIdsWithExtendedWarranty != null) {
+            SaleValidator.validateExtendedWarranties(productIds, productIdsWithExtendedWarranty);
+
             for (String productId : productIdsWithExtendedWarranty) {
                 extendedWarrantyQuantities.put(
                         productId,

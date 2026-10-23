@@ -1,7 +1,7 @@
 package com.gamezone.persistence;
 
 import com.gamezone.model.Sale;
-
+import com.gamezone.exceptions.PersistenceException;
 import java.io.*;
 import java.util.ArrayList;
 import java.util.List;
@@ -23,25 +23,27 @@ public class SaleRepository {
         this.filePath = filePath;
     }
 
-    /**
+       /**
      * Saves the complete list of sales to the file.
      *
      * @param sales the list of sales to persist
+     * @throws PersistenceException if the sales file cannot be written
      */
     public void saveAll(List<Sale> sales) {
         try (ObjectOutputStream oos =
                      new ObjectOutputStream(new FileOutputStream(filePath))) {
             oos.writeObject(sales);
         } catch (IOException e) {
-            System.out.println("Error saving sales: " + e.getMessage());
+            throw new PersistenceException("Error al escribir el archivo de ventas: " + filePath, e);
         }
     }
 
-    /**
+        /**
      * Loads the complete list of sales from the file.
      *
      * @return the list of previously saved sales, or an empty list if the file
-     * does not exist or cannot be read
+     * does not exist
+     * @throws PersistenceException if the sales file cannot be read
      */
     @SuppressWarnings("unchecked")
     public List<Sale> loadAll() {
@@ -55,7 +57,7 @@ public class SaleRepository {
                      new ObjectInputStream(new FileInputStream(filePath))) {
             return (List<Sale>) ois.readObject();
         } catch (IOException | ClassNotFoundException e) {
-            return new ArrayList<>();
+            throw new PersistenceException("Error al leer el archivo de ventas: " + filePath, e);
         }
     }
 }

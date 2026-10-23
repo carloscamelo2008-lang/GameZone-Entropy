@@ -1,7 +1,7 @@
 package com.gamezone.persistence;
 
 import com.gamezone.model.Product;
-
+import com.gamezone.exceptions.PersistenceException;
 import java.io.*;
 import java.util.ArrayList;
 import java.util.List;
@@ -25,25 +25,27 @@ public class ProductRepository {
         this.filePath = filePath;
     }
 
-    /**
+       /**
      * Saves the complete list of products to the file, overwriting
      * any previously stored data.
      *
      * @param products the list of products to persist
+     * @throws PersistenceException if the products file cannot be written
      */
     public void saveAll(List<Product> products) {
         try (ObjectOutputStream oos = new ObjectOutputStream(new FileOutputStream(filePath))) {
             oos.writeObject(products);
         } catch (IOException e) {
-            System.out.println("Error saving products: " + e.getMessage());
+            throw new PersistenceException("Error al escribir el archivo de productos: " + filePath, e);
         }
     }
 
-    /**
+        /**
      * Loads the complete list of products from the file. If the file
      * does not exist yet (e.g. on first run), an empty list is returned.
      *
      * @return the list of products previously saved, or an empty list
+     * @throws PersistenceException if the products file cannot be read
      */
     public List<Product> loadAll(){
         File file = new File(filePath);
@@ -54,7 +56,7 @@ public class ProductRepository {
         try (ObjectInputStream ois = new ObjectInputStream(new FileInputStream(filePath))){
             return (List<Product>) ois.readObject();
         } catch (IOException | ClassNotFoundException e){
-            return new ArrayList<>();
+            throw new PersistenceException("Error al leer el archivo de productos: " + filePath, e);
         }
     }
 
