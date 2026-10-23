@@ -9,7 +9,6 @@ import com.gamezone.exceptions.InvalidDataException;
 import com.gamezone.exceptions.ResourceNotFoundException;
 import java.util.ArrayList;
 import java.util.List;
-import com.gamezone.exceptions.PersistenceException;
 
 /**
  * Provides business operations for managing accessories: registration,
@@ -166,13 +165,11 @@ public class AccessoryService {
         Accessory accessory = findById(accessoryId);
 
         if (accessory == null) {
-            throw new ResourceNotFoundException(
-                    "Accessory not found: " + accessoryId
-            );
+            throw new ResourceNotFoundException("Accessory not found: " + accessoryId);
         }
 
         if (consoleId == null || consoleId.isBlank()) {
-throw new InvalidDataException("Console ID cannot be empty.");
+            throw new InvalidDataException("Console ID cannot be empty.");
         }
 
         if (!accessory.getCompatibleConsoleIds().contains(consoleId)) {

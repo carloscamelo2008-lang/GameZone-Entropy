@@ -1,5 +1,5 @@
 package com.gamezone.persistence;
-
+import com.gamezone.exceptions.PersistenceException;
 import com.gamezone.model.Accessory;
 import com.gamezone.model.Cable;
 import com.gamezone.model.Controller;
