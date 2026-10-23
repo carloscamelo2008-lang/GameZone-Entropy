@@ -266,10 +266,12 @@ Repositories are responsible for file access and serialization.
 
 ```text
 src/main/java/com/gamezone/
+├── exceptions/
 ├── model/
 ├── persistence/
 ├── service/
 ├── ui/
+├── validation/
 └── Main.java
 
 docs/
@@ -308,6 +310,46 @@ docs/ai-usage/
 ```
 
 Each team member maintains a personal log documenting the use of AI tools according to the integration requirement.
+
+## Exceptions and Validation
+
+The application uses a typed exception hierarchy to handle invalid data, business rule violations, missing resources, and persistence failures.
+
+### Exception Hierarchy
+
+All application-specific exceptions extend `GameZoneException`, which extends Java's `RuntimeException`.
+
+The hierarchy includes:
+
+- `GameZoneException`: Base class for application-specific exceptions.
+- `InvalidDataException`: Indicates invalid or incomplete input data, such as an empty name or a negative price.
+- `BusinessRuleException`: Indicates a business rule violation, such as a duplicate product identifier or insufficient stock.
+- `ResourceNotFoundException`: Indicates that a requested entity does not exist.
+- `PersistenceException`: Indicates a failure when reading or writing application data files. It preserves the underlying exception as its cause when available.
+
+Each exception supports constructors with a message and with a message plus the original cause.
+
+### Validators
+
+The `com.gamezone.validation` package centralizes validation rules:
+
+- `ProductValidator`: Validates product data, identifiers, prices, stock, and product existence.
+- `PersonValidator`: Validates customer and seller information, including names, phone numbers, and e-mail addresses.
+- `SaleValidator`: Validates sale items, customer and seller existence, available stock, and extended warranty assignments.
+
+The service layer invokes these validators before completing the corresponding business operations.
+
+### Persistence Error Handling
+
+The repositories translate file access failures into `PersistenceException` so that persistence errors can propagate through the service layer instead of being silently ignored.
+
+The original cause is preserved where available, allowing the underlying failure to be investigated. Missing data files may be treated as an empty initial data source where the repository supports first-run initialization.
+
+### User Interface Error Handling
+
+The console user interface handles application-specific exceptions through `GameZoneException` and displays error messages in Spanish. Invalid numeric input is also handled so that an incorrect entry does not unnecessarily terminate the menu.
+
+This approach separates validation and business rules from the user interface while providing clearer error handling across the application.
 
 ## Execution
 
