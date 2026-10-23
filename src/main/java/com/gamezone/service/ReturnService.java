@@ -6,7 +6,9 @@ import com.gamezone.model.Product;
 import com.gamezone.model.Return;
 import com.gamezone.model.Sale;
 import com.gamezone.persistence.ReturnRepository;
-
+import com.gamezone.exceptions.ResourceNotFoundException;
+import com.gamezone.exceptions.BusinessRuleException;
+import com.gamezone.exceptions.InvalidDataException;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
@@ -68,16 +70,16 @@ public class ReturnService {
         }
 
         if (!sale.canBeReturned()) {
-            throw new IllegalArgumentException(
-                    "No se puede registrar la devolución: han pasado más de 30 días desde la venta.");
+            throw new ResourceNotFoundException
+                    ("No se puede registrar la devolución: han pasado más de 30 días desde la venta.");
         }
 
         if (productIds == null || productIds.isEmpty()) {
-            throw new IllegalArgumentException("Debe indicar al menos un producto a devolver.");
+            throw new InvalidDataException("Debe indicar al menos un producto a devolver.");
         }
 
         if (reason == null || reason.isBlank()) {
-            throw new IllegalArgumentException("Debe indicar el motivo de la devolución.");
+           throw new InvalidDataException("Debe indicar el motivo de la devolución.");
         }
 
         Map<String, Integer> requested = countById(productIds);
@@ -89,13 +91,13 @@ public class ReturnService {
 
             Product product = findProductInSale(sale, productId);
             if (product == null) {
-                throw new IllegalArgumentException(
+                throw new BusinessRuleException(
                         "El producto " + productId + " no pertenece a la venta indicada.");
             }
 
             int available = countInSale(sale, productId) - countAlreadyReturned(sale, productId);
             if (quantity > available) {
-                throw new IllegalArgumentException(
+                throw new BusinessRuleException(
                         "No se pueden devolver " + quantity + " unidad(es) del producto " + productId
                         + ": solo quedan " + available + " por devolver en esta venta.");
             }
