@@ -6,7 +6,9 @@ import com.gamezone.model.Product;
 import com.gamezone.model.Return;
 import com.gamezone.model.Sale;
 import com.gamezone.persistence.ReturnRepository;
-
+import com.gamezone.exceptions.ResourceNotFoundException;
+import com.gamezone.exceptions.BusinessRuleException;
+import com.gamezone.exceptions.InvalidDataException;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
@@ -59,25 +61,27 @@ public class ReturnService {
      *                   repeat when several units are returned)
      * @param reason     the reason for the return
      * @return the newly registered return
-     * @throws IllegalArgumentException if any validation fails
+     * @throws ResourceNotFoundException if the specified sale does not exist
+     * @throws BusinessRuleException if the return period exceeds 30 days or the product does not belong to the sale
+     * @throws InvalidDataException if the product list is empty or the return reason is blank
      */
     public Return registerReturn(String saleId, List<String> productIds, String reason) {
         Sale sale = findSaleByReference(saleId);
         if (sale == null) {
-            throw new IllegalArgumentException("La venta indicada no existe.");
+            throw new ResourceNotFoundException("La venta indicada no existe.");
         }
 
         if (!sale.canBeReturned()) {
-            throw new IllegalArgumentException(
-                    "No se puede registrar la devolución: han pasado más de 30 días desde la venta.");
+            throw new BusinessRuleException
+                    ("No se puede registrar la devolución: han pasado más de 30 días desde la venta.");
         }
 
         if (productIds == null || productIds.isEmpty()) {
-            throw new IllegalArgumentException("Debe indicar al menos un producto a devolver.");
+            throw new InvalidDataException("Debe indicar al menos un producto a devolver.");
         }
 
         if (reason == null || reason.isBlank()) {
-            throw new IllegalArgumentException("Debe indicar el motivo de la devolución.");
+           throw new InvalidDataException("Debe indicar el motivo de la devolución.");
         }
 
         Map<String, Integer> requested = countById(productIds);
@@ -89,13 +93,13 @@ public class ReturnService {
 
             Product product = findProductInSale(sale, productId);
             if (product == null) {
-                throw new IllegalArgumentException(
+                throw new BusinessRuleException(
                         "El producto " + productId + " no pertenece a la venta indicada.");
             }
 
             int available = countInSale(sale, productId) - countAlreadyReturned(sale, productId);
             if (quantity > available) {
-                throw new IllegalArgumentException(
+                throw new BusinessRuleException(
                         "No se pueden devolver " + quantity + " unidad(es) del producto " + productId
                         + ": solo quedan " + available + " por devolver en esta venta.");
             }
@@ -187,11 +191,11 @@ public class ReturnService {
      * @param month the month (1-12)
      * @param year  the year
      * @return the total sales for the given month and year
-     * @throws IllegalArgumentException if the month is not between 1 and 12
+     * @throws InvalidDataException if the month is outside the valid range of 1 to 12
      */
     public double calculateMonthlySales(int month, int year) {
         if (month < 1 || month > 12) {
-            throw new IllegalArgumentException("El mes debe estar entre 1 y 12.");
+            throw new InvalidDataException("El mes debe estar entre 1 y 12.");
         }
 
         double totalSales = 0;
@@ -211,11 +215,11 @@ public class ReturnService {
      * @param month the month (1-12)
      * @param year  the year
      * @return the total returns for the given month and year
-     * @throws IllegalArgumentException if the month is not between 1 and 12
+     * @throws InvalidDataException if the month is outside the valid range of 1 to 12
      */
     public double calculateMonthlyReturns(int month, int year) {
         if (month < 1 || month > 12) {
-            throw new IllegalArgumentException("El mes debe estar entre 1 y 12.");
+            throw new InvalidDataException("El mes debe estar entre 1 y 12.");
         }
 
         double totalReturns = 0;
@@ -235,7 +239,7 @@ public class ReturnService {
      * @param month the month (1-12)
      * @param year  the year
      * @return the net balance (sales minus returns)
-     * @throws IllegalArgumentException if the month is not between 1 and 12
+     * @throws InvalidDataException if the month is outside the valid range of 1 to 12
      */
     public double generateMonthlyBalance(int month, int year) {
         return calculateMonthlySales(month, year) - calculateMonthlyReturns(month, year);

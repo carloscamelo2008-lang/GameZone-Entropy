@@ -6,7 +6,7 @@ import com.gamezone.model.PercentageDiscount;
 import com.gamezone.model.Promotion;
 import com.gamezone.model.Sale;
 import com.gamezone.persistence.PromotionRepository;
-
+import com.gamezone.exceptions.InvalidDataException;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
@@ -66,7 +66,7 @@ public class PromotionService {
                                                       LocalDate endDate, double percentage, String targetCategory) {
         if (!"VIDEOGAME".equalsIgnoreCase(targetCategory) && !"CONSOLE".equalsIgnoreCase(targetCategory)
                 && !"ACCESSORY".equalsIgnoreCase(targetCategory)) {
-            throw new IllegalArgumentException("La categoría objetivo debe ser VIDEOGAME, CONSOLE o ACCESSORY.");
+            throw new InvalidDataException("La categoría objetivo debe ser VIDEOGAME, CONSOLE o ACCESSORY.");
         }
         CategoryDiscount promotion = new CategoryDiscount(id, name, startDate, endDate, percentage, targetCategory);
         promotions.add(promotion);
