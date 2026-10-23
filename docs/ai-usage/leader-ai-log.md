@@ -12,7 +12,7 @@
 
 - **Tool:** ChatGPT
 - **Provider:** OpenAI
-- **Model:** GPT-5.6 Luna
+- **Model:** GPT-6
 
 ## Purpose
 
@@ -237,14 +237,67 @@ accepted.
 
 ---
 
+### 19. Requirement 6 - UI Exception Handling and Documentation
+
+- **Date:** 2026-10-22
+- **Tool:** ChatGPT
+- **Phase and branch:** Requirement 6 · `feature/req6-ui-exceptions`
+- **Objective:** Adapt the console user interface to the typed exception hierarchy and document the exception handling and validation mechanisms.
+- **Query:** Asked for guidance on replacing generic exception handlers in `UI.java`, handling invalid numeric input, and documenting the exception hierarchy, validators, and persistence failures in the README.
+- **Response:** The review identified 16 generic `catch (Exception e)` handlers. The guidance replaced them with `catch (GameZoneException e)`, added handling for `NumberFormatException` in the main menu flow, and provided a documentation section describing the custom exceptions, validators, and persistence error handling.
+- **Decision:** I applied the changes manually in IntelliJ and created separate commits for the UI adaptation and README documentation. I ran the Maven `clean` and `test` goals from IntelliJ. The project compiled 43 main source files successfully and reported `BUILD SUCCESS`; however, no automated tests were available to run.
+- **Related commits:**
+    - `d1a746a` - `fix: handle typed exceptions in console UI`
+    - `39b5775` - `docs: document exception handling and validation`
+
+### 20. Requirement 6 - Exception Documentation
+
+- **Date:** 2026-10-22
+- **Tool:** ChatGPT
+- **Phase and branch:** Requirement 6 · `feature/req6-ui-exceptions`
+- **Objective:** Complete the exception handling documentation and align the README with the actual project structure.
+- **Query:** Asked for guidance on documenting the exception hierarchy, validator responsibilities, persistence failures, and relationships between exceptions, validators, services, repositories, and the console UI.
+- **Response:** ChatGPT provided drafts for `docs/exception-analysis.md` and `docs/exception-class-diagram.md`, and guidance for updating the README project structure and documentation index.
+- **Decision:** I created and reviewed both Markdown files in IntelliJ, updated the README, checked the staged changes with `git diff --cached --check`, and committed the documentation changes.
+- **Related commit:** `6e798f9` - `docs: add exception analysis and class diagram`
+
+### 21. Requirement 6 - Startup Exception Handling
+
+- **Date:** 2026-10-22
+- **Tool:** ChatGPT
+- **Phase and branch:** Requirement 6 · `feature/req6-ui-exceptions`
+- **Objective:** Handle typed persistence and domain errors that may occur while initializing the application.
+- **Query:** Asked how to handle `GameZoneException` during repository and service initialization in `Main.java` and when starting the UI.
+- **Response:** The guidance recommended wrapping application initialization and `ui.start()` in a `try-catch` block for `GameZoneException`, then displaying a readable startup error instead of allowing that typed exception to go unhandled.
+- **Decision:** I applied the change in IntelliJ and ran Maven's `test` goal. Maven reported `BUILD SUCCESS`, but no automated tests were available to run.
+- **Related commit:** `ef9e990` - `fix: handle persistence errors during startup`
+
+---
+
+### 22. Requirement 6 - Documentation Update After Persistence Integration
+
+- **Date:** 2026-10-23
+- **Tool:** ChatGPT
+- **Provider:** OpenAI
+- **Model:** GPT-6
+- **Phase and branch:** Requirement 6 · `feature/req6-ui-exceptions`
+- **Objective:** Update the exception handling documentation after integrating the remaining persistence exception changes from Developer 2.
+- **Query:** Asked for a review of the merged persistence exception changes and guidance on updating the exception analysis, class diagram, README, and AI usage log while respecting the team's assigned responsibilities.
+- **Response:** ChatGPT reviewed PR #36, confirmed the updated exception handling in the four additional repositories, and provided guidance for synchronizing the feature branch and aligning the documentation with the integrated implementation.
+- **Decision:** I merged `origin/develop` into my feature branch, verified the project with Maven, removed the duplicate JavaDoc in `UI.java`, and updated the exception documentation to include the additional repositories. I reviewed the documentation changes before preparing the final commit.
+- **Related commits:**
+    - `0b4c477` - `style: remove duplicate UI javadoc`
+    - `ff71f9c` - Updated feature branch with the integrated changes from `develop`
+
 ## General Conclusion
 
-Throughout Requirement 5, I used ChatGPT mainly as a technical tutor,
-code reviewer, Git guide, Pull Request reviewer, and documentation reviewer.
+Throughout Requirement 5 and Requirement 6, I used ChatGPT mainly as a
+technical tutor, code reviewer, Git guide, Pull Request reviewer, and
+documentation reviewer.
 
 I wrote and modified the project files in IntelliJ, executed Git and Maven
-commands myself, performed the required tests, and made the final decisions
-about which suggestions to accept or reject.
+commands myself, performed the available verification checks, and made the
+final decisions about which suggestions to accept or reject.
 
 The most significant uses of AI were related to:
 
@@ -256,8 +309,13 @@ The most significant uses of AI were related to:
 - checking documentation against the actual implementation;
 - completing the A8 documentation;
 - reviewing the team's AI usage logs against the integration requirement;
-- synchronizing the documentation branch with the updated `develop` branch.
+- synchronizing the documentation branch with the updated `develop` branch;
+- adapting the console UI to typed exceptions and documenting validation;
+- documenting the exception hierarchy and class diagram;
+- handling typed exceptions during application startup.
 
 The final decisions were based on the actual repository state, the
-integration requirement, compiler results, application tests, Pull Request
-reviews, and the team's documented responsibilities.
+integration requirement, compiler results, available verification checks,
+Pull Request reviews, and the team's documented responsibilities.
+
+Maven reported `BUILD SUCCESS`, but no automated tests were available to run.

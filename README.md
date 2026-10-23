@@ -265,29 +265,37 @@ Repositories are responsible for file access and serialization.
 ## Project Structure
 
 ```text
-src/main/java/com/gamezone/
-├── model/
-├── persistence/
-├── service/
-├── ui/
-└── Main.java
-
-docs/
-├── analysis.md
-├── class-diagram.md
-├── hierarchy-diagram.md
-├── layers-diagram.md
-├── accessory-analysis.md
-├── accessory-class-diagram.md
-├── promotion-analysis.md
-├── promotion-class-diagram.md
-├── warranty-analysis.md
-├── warranty-class-diagram.md
-├── return-analysis.md
-├── return-class-diagram.md
-├── integration-analysis.md
-├── integrated-class-diagram.md
-└── ai-usage/
+GameZone-Entropy/
+├── src/
+│   └── main/
+│       └── java/
+│           └── com/
+│               └── gamezone/
+│                   ├── exceptions/
+│                   ├── model/
+│                   ├── persistence/
+│                   ├── service/
+│                   ├── ui/
+│                   ├── validation/
+│                   └── Main.java
+└── docs/
+    ├── analysis.md
+    ├── class-diagram.md
+    ├── hierarchy-diagram.md
+    ├── layers-diagram.md
+    ├── accessory-analysis.md
+    ├── accessory-class-diagram.md
+    ├── promotion-analysis.md
+    ├── promotion-class-diagram.md
+    ├── warranty-analysis.md
+    ├── warranty-class-diagram.md
+    ├── return-analysis.md
+    ├── return-class-diagram.md
+    ├── integration-analysis.md
+    ├── integrated-class-diagram.md
+    ├── exception-analysis.md
+    ├── exception-class-diagram.md
+    └── ai-usage/
 ```
 
 ## Documentation
@@ -300,6 +308,7 @@ The project includes:
 - Integrated class diagram.
 - Integrated layers diagram.
 - AI usage logs.
+- Exception handling analysis and class diagram.
 
 The AI usage logs are stored in:
 
@@ -308,6 +317,56 @@ docs/ai-usage/
 ```
 
 Each team member maintains a personal log documenting the use of AI tools according to the integration requirement.
+
+## Exceptions and Validation
+
+The application uses a typed exception hierarchy to handle invalid data, business rule violations, missing resources, and persistence failures.
+
+### Exception Hierarchy
+
+All application-specific exceptions extend `GameZoneException`, which extends Java's `RuntimeException`.
+
+The hierarchy includes:
+
+- `GameZoneException`: Base class for application-specific exceptions.
+- `InvalidDataException`: Indicates invalid or incomplete input data, such as an empty name or a negative price.
+- `BusinessRuleException`: Indicates a business rule violation, such as a duplicate product identifier or insufficient stock.
+- `ResourceNotFoundException`: Indicates that a requested entity does not exist.
+- `PersistenceException`: Indicates a failure when reading or writing application data files. It preserves the underlying exception as its cause when available.
+
+Each exception supports constructors with a message and with a message plus the original cause.
+
+### Validators
+
+The `com.gamezone.validation` package centralizes validation rules:
+
+- `ProductValidator`: Validates product data, identifiers, prices, stock, and product existence.
+- `PersonValidator`: Validates customer and seller information, including names, phone numbers, and e-mail addresses.
+- `SaleValidator`: Validates sale items, customer and seller existence, available stock, and extended warranty assignments.
+
+The service layer invokes these validators before completing the corresponding business operations.
+
+### Persistence Error Handling
+
+The repositories use `PersistenceException` to report relevant file access failures while preserving the original cause when available.
+
+The following repositories apply this behavior:
+
+- `PersonRepository`
+- `ProductRepository`
+- `SaleRepository`
+- `AccessoryRepository`
+- `PromotionRepository`
+- `ReturnRepository`
+- `WarrantyRepository`
+
+The repositories remain responsible for reading and writing their data, while services allow application-specific exceptions to propagate to the caller.
+
+Missing data files may be treated as an empty initial data source when supported by the repository implementation. An unreadable or corrupted existing file may cause application initialization to fail.
+
+### User Interface Error Handling
+
+The console user interface handles application-specific exceptions through `GameZoneException` and displays error messages in Spanish. Invalid numeric input is also handled so that an incorrect entry does not unnecessarily terminate the menu.
 
 ## Execution
 

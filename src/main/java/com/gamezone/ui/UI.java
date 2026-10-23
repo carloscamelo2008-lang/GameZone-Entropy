@@ -11,6 +11,11 @@ import java.util.Scanner;
 import com.gamezone.model.Accessory;
 import com.gamezone.service.AccessoryService;
 import com.gamezone.service.ReturnService;
+import com.gamezone.exceptions.GameZoneException;
+import com.gamezone.exceptions.ResourceNotFoundException;
+import com.gamezone.exceptions.InvalidDataException;
+import com.gamezone.exceptions.BusinessRuleException;
+import com.gamezone.exceptions.PersistenceException;
 
 /**
  * Provides the console-based user interface for GameZone.
@@ -47,6 +52,7 @@ public class UI {
         this.scanner = new Scanner(System.in);
         this.returnService = returnService;
     }
+
     /**
      * Starts the console user interface.
      */
@@ -58,52 +64,72 @@ public class UI {
 
             String option = scanner.nextLine();
 
-            switch (option) {
-                case "0":
-                    running = false;
-                    System.out.println("Goodbye!");
-                    break;
-                case "1":
-                    registerVideoGame();
-                    break;
+            try {
+                switch (option) {
+                    case "0":
+                        running = false;
+                        System.out.println("Goodbye!");
+                        break;
 
-                case "2":
-                    registerConsole();
-                    break;
+                    case "1":
+                        registerVideoGame();
+                        break;
 
-                case "3":
-                    listProducts();
-                    break;
-                case "4":
-                    registerCustomer();
-                    break;
-                case "5":
-                    listCustomers();
-                    break;
-                case "6":
-                    listSellers();
-                    break;
-                case "7":
-                    registerSale();
-                    break;
-                case "8":
-                    listAllSales();
-                    break;
-                case "9":
-                    listCustomerSales();
-                    break;
-                case "10":
-                    listSellerSales();
-                    break;
-                case "11":
-                    manageAccessories();
-                    break;
-                case "12":
-                    showMonthlyBalance();
-                    break;
-                default:
-                    System.out.println("Opción no válida. Intente nuevamente.");
-                    break;
+                    case "2":
+                        registerConsole();
+                        break;
+
+                    case "3":
+                        listProducts();
+                        break;
+
+                    case "4":
+                        registerCustomer();
+                        break;
+
+                    case "5":
+                        listCustomers();
+                        break;
+
+                    case "6":
+                        listSellers();
+                        break;
+
+                    case "7":
+                        registerSale();
+                        break;
+
+                    case "8":
+                        listAllSales();
+                        break;
+
+                    case "9":
+                        listCustomerSales();
+                        break;
+
+                    case "10":
+                        listSellerSales();
+                        break;
+
+                    case "11":
+                        manageAccessories();
+                        break;
+
+                    case "12":
+                        showMonthlyBalance();
+                        break;
+
+                    default:
+                        System.out.println(
+                                "Opción no válida. Intente nuevamente."
+                        );
+                        break;
+                }
+            } catch (NumberFormatException e) {
+                System.out.println(
+                        "Entrada numérica inválida. "
+                                + "Ingrese un número válido e inténtelo de nuevo."
+                );
             }
         }
     }
@@ -168,8 +194,16 @@ public class UI {
             );
 
             System.out.println("Videojuego registrado correctamente.");
-        } catch (Exception e) {
-            System.out.println("Error al registrar el videojuego: " + e.getMessage());
+        } catch (ResourceNotFoundException e) {
+            printError("registrar el videojuego", "Recurso no encontrado", e);
+        } catch (InvalidDataException e) {
+            printError("registrar el videojuego", "Datos inválidos", e);
+        } catch (BusinessRuleException e) {
+            printError("registrar el videojuego", "Regla del negocio incumplida", e);
+        } catch (PersistenceException e) {
+            printError("registrar el videojuego", "Error de persistencia", e);
+        } catch (GameZoneException e) {
+            printError("registrar el videojuego", "Error general de la aplicación", e);
         }
     }
     /**
@@ -211,8 +245,16 @@ public class UI {
             );
 
             System.out.println("Consola registrada correctamente.");
-        } catch (Exception e) {
-            System.out.println("Error al registrar la consola: " + e.getMessage());
+        } catch (ResourceNotFoundException e) {
+            printError("registrar la consola", "Recurso no encontrado", e);
+        } catch (InvalidDataException e) {
+            printError("registrar la consola", "Datos inválidos", e);
+        } catch (BusinessRuleException e) {
+            printError("registrar la consola", "Regla del negocio incumplida", e);
+        } catch (PersistenceException e) {
+            printError("registrar la consola", "Error de persistencia", e);
+        } catch (GameZoneException e) {
+            printError("registrar la consola", "Error general de la aplicación", e);
         }
     }
     /**
@@ -237,8 +279,16 @@ public class UI {
                                 + " | Stock: " + product.getStock()
                 );
             }
-        } catch (Exception e) {
-            System.out.println("Error al listar los productos: " + e.getMessage());
+        } catch (ResourceNotFoundException e) {
+            printError("listar los productos", "Recurso no encontrado", e);
+        } catch (InvalidDataException e) {
+            printError("listar los productos", "Datos inválidos", e);
+        } catch (BusinessRuleException e) {
+            printError("listar los productos", "Regla del negocio incumplida", e);
+        } catch (PersistenceException e) {
+            printError("listar los productos", "Error de persistencia", e);
+        } catch (GameZoneException e) {
+            printError("listar los productos", "Error general de la aplicación", e);
         }
     }
 
@@ -280,8 +330,16 @@ public class UI {
         try {
             personService.registerCustomer(id, name, phone, email);
             System.out.println("Cliente registrado correctamente.");
-        } catch (Exception e) {
-            System.out.println("Error al registrar el cliente: " + e.getMessage());
+        } catch (ResourceNotFoundException e) {
+            printError("registrar el cliente", "Recurso no encontrado", e);
+        } catch (InvalidDataException e) {
+            printError("registrar el cliente", "Datos inválidos", e);
+        } catch (BusinessRuleException e) {
+            printError("registrar el cliente", "Regla del negocio incumplida", e);
+        } catch (PersistenceException e) {
+            printError("registrar el cliente", "Error de persistencia", e);
+        } catch (GameZoneException e) {
+            printError("registrar el cliente", "Error general de la aplicación", e);
         }
     }
     /**
@@ -381,10 +439,16 @@ public class UI {
             System.out.println();
             System.out.println(sale.generateReceipt());
 
-        } catch (Exception e) {
-            System.out.println(
-                    "Error al registrar la venta: " + e.getMessage()
-            );
+        } catch (ResourceNotFoundException e) {
+            printError("registrar la venta", "Recurso no encontrado", e);
+        } catch (InvalidDataException e) {
+            printError("registrar la venta", "Datos inválidos", e);
+        } catch (BusinessRuleException e) {
+            printError("registrar la venta", "Regla del negocio incumplida", e);
+        } catch (PersistenceException e) {
+            printError("registrar la venta", "Error de persistencia", e);
+        } catch (GameZoneException e) {
+            printError("registrar la venta", "Error general de la aplicación", e);
         }
     }
     /**
@@ -420,10 +484,16 @@ public class UI {
 
                 System.out.println();
             }
-        } catch (Exception e) {
-            System.out.println(
-                    "Error al listar el historial de ventas: " + e.getMessage()
-            );
+        } catch (ResourceNotFoundException e) {
+            printError("listar el historial de ventas", "Recurso no encontrado", e);
+        } catch (InvalidDataException e) {
+            printError("listar el historial de ventas", "Datos inválidos", e);
+        } catch (BusinessRuleException e) {
+            printError("listar el historial de ventas", "Regla del negocio incumplida", e);
+        } catch (PersistenceException e) {
+            printError("listar el historial de ventas", "Error de persistencia", e);
+        } catch (GameZoneException e) {
+            printError("listar el historial de ventas", "Error general de la aplicación", e);
         }
     }
     /**
@@ -462,11 +532,16 @@ public class UI {
 
                 System.out.println();
             }
-        } catch (Exception e) {
-            System.out.println(
-                    "Error al consultar el historial del cliente: "
-                            + e.getMessage()
-            );
+        } catch (ResourceNotFoundException e) {
+            printError("consultar el historial del cliente", "Recurso no encontrado", e);
+        } catch (InvalidDataException e) {
+            printError("consultar el historial del cliente", "Datos inválidos", e);
+        } catch (BusinessRuleException e) {
+            printError("consultar el historial del cliente", "Regla del negocio incumplida", e);
+        } catch (PersistenceException e) {
+            printError("consultar el historial del cliente", "Error de persistencia", e);
+        } catch (GameZoneException e) {
+            printError("consultar el historial del cliente", "Error general de la aplicación", e);
         }
     }
     /**
@@ -505,11 +580,16 @@ public class UI {
 
                 System.out.println();
             }
-        } catch (Exception e) {
-            System.out.println(
-                    "Error al consultar el historial del vendedor: "
-                            + e.getMessage()
-            );
+        } catch (ResourceNotFoundException e) {
+            printError("consultar el historial del vendedor", "Recurso no encontrado", e);
+        } catch (InvalidDataException e) {
+            printError("consultar el historial del vendedor", "Datos inválidos", e);
+        } catch (BusinessRuleException e) {
+            printError("consultar el historial del vendedor", "Regla del negocio incumplida", e);
+        } catch (PersistenceException e) {
+            printError("consultar el historial del vendedor", "Error de persistencia", e);
+        } catch (GameZoneException e) {
+            printError("consultar el historial del vendedor", "Error general de la aplicación", e);
         }
     }
     /**
@@ -598,10 +678,16 @@ public class UI {
             );
 
             System.out.println("Controlador registrado correctamente.");
-        } catch (Exception e) {
-            System.out.println(
-                    "Error al registrar el controlador: " + e.getMessage()
-            );
+        } catch (ResourceNotFoundException e) {
+            printError("registrar el controlador", "Recurso no encontrado", e);
+        } catch (InvalidDataException e) {
+            printError("registrar el controlador", "Datos inválidos", e);
+        } catch (BusinessRuleException e) {
+            printError("registrar el controlador", "Regla del negocio incumplida", e);
+        } catch (PersistenceException e) {
+            printError("registrar el controlador", "Error de persistencia", e);
+        } catch (GameZoneException e) {
+            printError("registrar el controlador", "Error general de la aplicación", e);
         }
     }
     /**
@@ -643,10 +729,16 @@ public class UI {
             );
 
             System.out.println("Cable registrado correctamente.");
-        } catch (Exception e) {
-            System.out.println(
-                    "Error al registrar el cable: " + e.getMessage()
-            );
+        } catch (ResourceNotFoundException e) {
+            printError("registrar el cable", "Recurso no encontrado", e);
+        } catch (InvalidDataException e) {
+            printError("registrar el cable", "Datos inválidos", e);
+        } catch (BusinessRuleException e) {
+            printError("registrar el cable", "Regla del negocio incumplida", e);
+        } catch (PersistenceException e) {
+            printError("registrar el cable", "Error de persistencia", e);
+        } catch (GameZoneException e) {
+            printError("registrar el cable", "Error general de la aplicación", e);
         }
     }
     /**
@@ -688,10 +780,16 @@ public class UI {
             );
 
             System.out.println("Memoria registrada correctamente.");
-        } catch (Exception e) {
-            System.out.println(
-                    "Error al registrar la memoria: " + e.getMessage()
-            );
+        } catch (ResourceNotFoundException e) {
+            printError("registrar la memoria", "Recurso no encontrado", e);
+        } catch (InvalidDataException e) {
+            printError("registrar la memoria", "Datos inválidos", e);
+        } catch (BusinessRuleException e) {
+            printError("registrar la memoria", "Regla del negocio incumplida", e);
+        } catch (PersistenceException e) {
+            printError("registrar la memoria", "Error de persistencia", e);
+        } catch (GameZoneException e) {
+            printError("registrar la memoria", "Error general de la aplicación", e);
         }
     }
     /**
@@ -711,10 +809,16 @@ public class UI {
             for (Accessory accessory : accessories) {
                 System.out.println(accessory.getDescription());
             }
-        } catch (Exception e) {
-            System.out.println(
-                    "Error al listar los accesorios: " + e.getMessage()
-            );
+        } catch (ResourceNotFoundException e) {
+            printError("listar los accesorios", "Recurso no encontrado", e);
+        } catch (InvalidDataException e) {
+            printError("listar los accesorios", "Datos inválidos", e);
+        } catch (BusinessRuleException e) {
+            printError("listar los accesorios", "Regla del negocio incumplida", e);
+        } catch (PersistenceException e) {
+            printError("listar los accesorios", "Error de persistencia", e);
+        } catch (GameZoneException e) {
+            printError("listar los accesorios", "Error general de la aplicación", e);
         }
     }
     /**
@@ -738,10 +842,16 @@ public class UI {
             for (Accessory accessory : accessories) {
                 System.out.println(accessory.getDescription());
             }
-        } catch (Exception e) {
-            System.out.println(
-                    "Error al filtrar los accesorios: " + e.getMessage()
-            );
+        } catch (ResourceNotFoundException e) {
+            printError("filtrar los accesorios", "Recurso no encontrado", e);
+        } catch (InvalidDataException e) {
+            printError("filtrar los accesorios", "Datos inválidos", e);
+        } catch (BusinessRuleException e) {
+            printError("filtrar los accesorios", "Regla del negocio incumplida", e);
+        } catch (PersistenceException e) {
+            printError("filtrar los accesorios", "Error de persistencia", e);
+        } catch (GameZoneException e) {
+            printError("filtrar los accesorios", "Error general de la aplicación", e);
         }
     }
     /**
@@ -767,10 +877,16 @@ public class UI {
             for (Accessory accessory : accessories) {
                 System.out.println(accessory.getDescription());
             }
-        } catch (Exception e) {
-            System.out.println(
-                    "Error al consultar compatibilidad: " + e.getMessage()
-            );
+        } catch (ResourceNotFoundException e) {
+            printError("consultar compatibilidad", "Recurso no encontrado", e);
+        } catch (InvalidDataException e) {
+            printError("consultar compatibilidad", "Datos inválidos", e);
+        } catch (BusinessRuleException e) {
+            printError("consultar compatibilidad", "Regla del negocio incumplida", e);
+        } catch (PersistenceException e) {
+            printError("consultar compatibilidad", "Error de persistencia", e);
+        } catch (GameZoneException e) {
+            printError("consultar compatibilidad", "Error general de la aplicación", e);
         }
     }
     /**
@@ -794,11 +910,16 @@ public class UI {
             System.out.println(
                     "Consola compatible asignada correctamente."
             );
-        } catch (Exception e) {
-            System.out.println(
-                    "Error al asignar la consola compatible: "
-                            + e.getMessage()
-            );
+        } catch (ResourceNotFoundException e) {
+            printError("asignar la consola compatible", "Recurso no encontrado", e);
+        } catch (InvalidDataException e) {
+            printError("asignar la consola compatible", "Datos inválidos", e);
+        } catch (BusinessRuleException e) {
+            printError("asignar la consola compatible", "Regla del negocio incumplida", e);
+        } catch (PersistenceException e) {
+            printError("asignar la consola compatible", "Error de persistencia", e);
+        } catch (GameZoneException e) {
+            printError("asignar la consola compatible", "Error general de la aplicación", e);
         }
     }
     /**
@@ -822,8 +943,33 @@ public class UI {
             System.out.println("Total de devoluciones: $" + monthlyReturns);
             System.out.println("Balance neto: $" + monthlyBalance);
 
-        } catch (Exception e) {
-            System.out.println("Error al generar el balance mensual: " + e.getMessage());
+        } catch (ResourceNotFoundException e) {
+            printError("generar el balance mensual", "Recurso no encontrado", e);
+        } catch (InvalidDataException e) {
+            printError("generar el balance mensual", "Datos inválidos", e);
+        } catch (BusinessRuleException e) {
+            printError("generar el balance mensual", "Regla del negocio incumplida", e);
+        } catch (PersistenceException e) {
+            printError("generar el balance mensual", "Error de persistencia", e);
+        } catch (GameZoneException e) {
+            printError("generar el balance mensual", "Error general de la aplicación", e);
         }
     }
+    /**
+     * Prints a Spanish error message according to the exception category.
+     *
+     * @param operation operation being performed
+     * @param category category of the application exception
+     * @param exception exception raised by the application
+     */
+    private void printError(
+            String operation,
+            String category,
+            GameZoneException exception) {
+        System.out.println(
+                "Error al " + operation + ". "
+                        + category + ": " + exception.getMessage()
+        );
+    }
+
 }
