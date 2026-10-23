@@ -48,3 +48,41 @@ The audit covers the nine GRASP patterns named in the requirement. Each verdict 
 - `Main` is limited to application setup and starting the UI; it does not process individual sale rules.
 
 **Evidence:** [UI.java, lines 59-125](https://github.com/carloscamelo2008-lang/GameZone-Entropy/blob/f6f35d676e8a29cdddabb28a093a1158175aa266/src/main/java/com/gamezone/ui/UI.java#L59-L125); [UI.java, lines 364-450](https://github.com/carloscamelo2008-lang/GameZone-Entropy/blob/f6f35d676e8a29cdddabb28a093a1158175aa266/src/main/java/com/gamezone/ui/UI.java#L364-L450); [SaleService.java, lines 78-204](https://github.com/carloscamelo2008-lang/GameZone-Entropy/blob/f6f35d676e8a29cdddabb28a093a1158175aa266/src/main/java/com/gamezone/service/SaleService.java#L78-L204).
+
+
+## 4. Low Coupling
+
+**Verdict: `violation`**
+
+**Finding: `LEAD-GRASP-01` (shared with Patterns 5, 6, and 9).**
+
+The avoidable coupling is concentrated in the console sale interaction. `UI.registerSale()` queries `ProductService.listAllProducts()`, inspects each concrete product as a `Console`, and uses that type check to decide whether to prompt for an extended warranty. `SaleService.registerSale()` independently performs another `instanceof Console` check before assigning warranties. This makes the UI depend on a concrete domain subtype and duplicates a rule that affects the sale workflow.
+
+The existence of multiple collaborators in `SaleService` is not treated as a violation by itself: the requirement explicitly assigns the service responsibility for coordinating products, accessories, promotions, and warranties. The supported coupling finding is the duplicated concrete-type decision across the UI and service.
+
+**Evidence:** [UI.java, lines 400-424](https://github.com/carloscamelo2008-lang/GameZone-Entropy/blob/f6f35d676e8a29cdddabb28a093a1158175aa266/src/main/java/com/gamezone/ui/UI.java#L400-L424); [SaleService.java, lines 147-182](https://github.com/carloscamelo2008-lang/GameZone-Entropy/blob/f6f35d676e8a29cdddabb28a093a1158175aa266/src/main/java/com/gamezone/service/SaleService.java#L147-L182).
+
+## 5. High Cohesion
+
+**Verdict: `violation`**
+
+**Finding: `LEAD-GRASP-01`.**
+
+The console UI's main role is to gather input, route commands, and display results. However, `UI.registerSale()` also retrieves inventory records and decides warranty eligibility by checking the product's concrete type. That policy-level decision overlaps with the same decision inside `SaleService.registerSale()`. The issue is not that one console menu exposes several application operations; it is that this sale handler mixes presentation with domain-type policy and duplicates the service's decision.
+
+**Evidence:** [UI.java, lines 364-450](https://github.com/carloscamelo2008-lang/GameZone-Entropy/blob/f6f35d676e8a29cdddabb28a093a1158175aa266/src/main/java/com/gamezone/ui/UI.java#L364-L450); [SaleService.java, lines 147-182](https://github.com/carloscamelo2008-lang/GameZone-Entropy/blob/f6f35d676e8a29cdddabb28a093a1158175aa266/src/main/java/com/gamezone/service/SaleService.java#L147-L182).
+
+## 6. Polymorphism
+
+**Verdict: `violation`**
+
+**Finding: `LEAD-GRASP-01`.**
+
+The workflow selects warranty behavior with explicit type checks:
+
+- `UI.registerSale()` checks `product instanceof Console` before asking whether an extended warranty is wanted.
+- `SaleService.registerSale()` checks `product instanceof Console` before assigning basic and optional extended warranties.
+
+This is behavior that varies by product subtype, but the variation is encoded as conditionals in two classes rather than exposed through one polymorphic eligibility contract or a single warranty-policy abstraction. If another product subtype becomes eligible for warranties, both locations would need coordinated edits.
+
+**Evidence:** [UI.java, lines 400-424](https://github.com/carloscamelo2008-lang/GameZone-Entropy/blob/f6f35d676e8a29cdddabb28a093a1158175aa266/src/main/java/com/gamezone/ui/UI.java#L400-L424); [SaleService.java, lines 147-182](https://github.com/carloscamelo2008-lang/GameZone-Entropy/blob/f6f35d676e8a29cdddabb28a093a1158175aa266/src/main/java/com/gamezone/service/SaleService.java#L147-L182).
