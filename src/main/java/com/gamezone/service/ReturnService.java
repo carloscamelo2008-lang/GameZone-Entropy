@@ -61,7 +61,9 @@ public class ReturnService {
      *                   repeat when several units are returned)
      * @param reason     the reason for the return
      * @return the newly registered return
-     * @throws IllegalArgumentException if any validation fails
+     * @throws ResourceNotFoundException if the specified sale does not exist
+     * @throws BusinessRuleException if the return period exceeds 30 days or the product does not belong to the sale
+     * @throws InvalidDataException if the product list is empty or the return reason is blank
      */
     public Return registerReturn(String saleId, List<String> productIds, String reason) {
         Sale sale = findSaleByReference(saleId);
@@ -189,7 +191,7 @@ public class ReturnService {
      * @param month the month (1-12)
      * @param year  the year
      * @return the total sales for the given month and year
-     * @throws IllegalArgumentException if the month is not between 1 and 12
+     * @throws InvalidDataException if the month is outside the valid range of 1 to 12
      */
     public double calculateMonthlySales(int month, int year) {
         if (month < 1 || month > 12) {
@@ -213,7 +215,7 @@ public class ReturnService {
      * @param month the month (1-12)
      * @param year  the year
      * @return the total returns for the given month and year
-     * @throws IllegalArgumentException if the month is not between 1 and 12
+     * @throws InvalidDataException if the month is outside the valid range of 1 to 12
      */
     public double calculateMonthlyReturns(int month, int year) {
         if (month < 1 || month > 12) {
@@ -237,7 +239,7 @@ public class ReturnService {
      * @param month the month (1-12)
      * @param year  the year
      * @return the net balance (sales minus returns)
-     * @throws IllegalArgumentException if the month is not between 1 and 12
+     * @throws InvalidDataException if the month is outside the valid range of 1 to 12
      */
     public double generateMonthlyBalance(int month, int year) {
         return calculateMonthlySales(month, year) - calculateMonthlyReturns(month, year);
