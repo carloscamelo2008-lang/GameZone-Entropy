@@ -180,7 +180,7 @@ Within `SaleService.registerSale()`, warranty records are persisted through `War
 - All nine required GRASP patterns have a verdict for the scoped leader code.
 - One underlying design finding, `V-01`, is cross-referenced under four patterns so it can be consolidated and corrected only once.
 - The two observations listed outside scope remain unchanged.
-- This is the **individual leader audit**, not the team's consolidated audit. The consolidated report must wait for the Developer 1 and Developer 2 audit reports, then validate evidence, merge duplicate/cross-boundary findings, and assign final correction owners.
+- This file is the **individual leader audit** and preserves its findings and evidence. The Developer 1 and Developer 2 reports have since been approved and merged into `develop`; final team verdicts, unified finding IDs, cross-boundary assignments, and correction ownership are recorded in [`consolidated-audit.md`](consolidated-audit.md). Where this individual report's local finding IDs differ from the final team IDs, the consolidated report is authoritative.
 - This phase changes documentation only. Runtime behavior and application code have not been refactored.
 
 
