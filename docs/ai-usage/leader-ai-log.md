@@ -12,7 +12,7 @@
 
 - **Tool:** ChatGPT
 - **Provider:** OpenAI
-- **Model:** GPT-5.6 Luna
+- **Model:** GPT-6
 
 ## Purpose
 
@@ -237,10 +237,22 @@ accepted.
 
 ---
 
+### 19. Requirement 6 - UI Exception Handling and Documentation
+
+- **Date:** 2026-10-22
+- **Tool:** ChatGPT
+- **Phase and branch:** Requirement 6 · `feature/req6-ui-exceptions`
+- **Objective:** Adapt the console user interface to the typed exception hierarchy and document the exception handling and validation mechanisms.
+- **Query:** Asked for guidance on replacing generic exception handlers in `UI.java`, handling invalid numeric input, and documenting the exception hierarchy, validators, and persistence failures in the README.
+- **Response:** The review identified 16 generic `catch (Exception e)` handlers. The guidance replaced them with `catch (GameZoneException e)`, added handling for `NumberFormatException` in the main menu flow, and provided a documentation section describing the custom exceptions, validators, and persistence error handling.
+- **Decision:** I applied the changes manually in IntelliJ and created separate commits for the UI adaptation and README documentation. I ran the Maven `clean` and `test` goals from IntelliJ. The project compiled 43 main source files successfully and reported `BUILD SUCCESS`; however, no automated tests were available to run.
+- **Related commits:**
+    - `d1a746a` - `fix: handle typed exceptions in console UI`
+    - `39b5775` - `docs: document exception handling and validation`
+
 ## General Conclusion
 
-Throughout Requirement 5, I used ChatGPT mainly as a technical tutor,
-code reviewer, Git guide, Pull Request reviewer, and documentation reviewer.
+Throughout Requirement 5 and the initial work on Requirement 6, I used ChatGPT mainly as a technical tutor, code reviewer, Git guide, Pull Request reviewer, and documentation reviewer.
 
 I wrote and modified the project files in IntelliJ, executed Git and Maven
 commands myself, performed the required tests, and made the final decisions
@@ -256,7 +268,8 @@ The most significant uses of AI were related to:
 - checking documentation against the actual implementation;
 - completing the A8 documentation;
 - reviewing the team's AI usage logs against the integration requirement;
-- synchronizing the documentation branch with the updated `develop` branch.
+- synchronizing the documentation branch with the updated `develop` branch;
+- adapting the console UI to typed exceptions and documenting validation;
 
 The final decisions were based on the actual repository state, the
 integration requirement, compiler results, application tests, Pull Request
