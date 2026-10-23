@@ -131,3 +131,28 @@ This pattern assessment refers to the same underlying finding as Pattern 6. It d
 | `LEAD-GRASP-01` | Low Coupling, High Cohesion, Polymorphism, Protected Variations | Extended-warranty eligibility is determined by duplicated `instanceof Console` checks in the UI and sale service. | `UI.registerSale()` and `SaleService.registerSale()`; Technical Leader owns both scoped locations. |
 
 The four pattern references above describe one underlying design issue, so they should be consolidated as one correction rather than four duplicate tasks. No application-code correction is made during Phase 1.
+
+
+## Findings outside the GRASP refactor scope
+
+Requirement 7 says to record functional defects separately and leave them unchanged during this audit/refactor requirement. The following observations are therefore not counted as GRASP violations and were not fixed.
+
+### `LEAD-OUT-01` - Sales history displays the subtotal as the total
+
+The three sales-history operations in `UI.java` display `sale.calculateTotal()`: `listAllSales()`, `listCustomerSales()`, and `listSellerSales()`. However, the `Sale` API distinguishes the subtotal from `calculateFinalTotal()`, which subtracts the discount and adds extended-warranty cost. The displayed amount may therefore differ from the final sale amount for discounted or warranty-bearing sales.
+
+**Evidence:** [UI.java, lines 457-473](https://github.com/carloscamelo2008-lang/GameZone-Entropy/blob/f6f35d676e8a29cdddabb28a093a1158175aa266/src/main/java/com/gamezone/ui/UI.java#L457-L473); [UI.java, lines 502-521](https://github.com/carloscamelo2008-lang/GameZone-Entropy/blob/f6f35d676e8a29cdddabb28a093a1158175aa266/src/main/java/com/gamezone/ui/UI.java#L502-L521); [UI.java, lines 550-569](https://github.com/carloscamelo2008-lang/GameZone-Entropy/blob/f6f35d676e8a29cdddabb28a093a1158175aa266/src/main/java/com/gamezone/ui/UI.java#L550-L569); [Sale.java, lines 136-154](https://github.com/carloscamelo2008-lang/GameZone-Entropy/blob/f6f35d676e8a29cdddabb28a093a1158175aa266/src/main/java/com/gamezone/model/Sale.java#L136-L154).
+
+### `LEAD-OUT-02` - Sale registration has a partial-persistence risk
+
+Within `SaleService.registerSale()`, warranty records are persisted through `WarrantyService`, stock updates are persisted through the product/accessory services, and only afterward is the sale saved through `SaleRepository.saveAll(sales)`. If a later persistence operation fails, earlier side effects may already have been stored. This is recorded as a failure-path consistency risk to verify in a later requirement, not as a GRASP correction in this phase.
+
+**Evidence:** [SaleService.java, lines 147-202](https://github.com/carloscamelo2008-lang/GameZone-Entropy/blob/f6f35d676e8a29cdddabb28a093a1158175aa266/src/main/java/com/gamezone/service/SaleService.java#L147-L202); [WarrantyService.java, warranty persistence operations](https://github.com/carloscamelo2008-lang/GameZone-Entropy/blob/f6f35d676e8a29cdddabb28a093a1158175aa266/src/main/java/com/gamezone/service/WarrantyService.java#L45-L93); [SaleRepository.java, saveAll](https://github.com/carloscamelo2008-lang/GameZone-Entropy/blob/f6f35d676e8a29cdddabb28a093a1158175aa266/src/main/java/com/gamezone/persistence/SaleRepository.java#L20-L39).
+
+## Audit completion and limitations
+
+- All nine required GRASP patterns have a verdict for the scoped leader code.
+- One underlying design finding, `LEAD-GRASP-01`, is cross-referenced under four patterns so it can be consolidated and corrected only once.
+- The two observations listed outside scope remain unchanged.
+- This is the **individual leader audit**, not the team's consolidated audit. The consolidated report must wait for the Developer 1 and Developer 2 audit reports, then validate evidence, merge duplicate/cross-boundary findings, and assign final correction owners.
+- This phase changes documentation only. Runtime behavior and application code have not been refactored.
