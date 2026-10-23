@@ -15,9 +15,8 @@
 ## 2. Evaluation of GRASP Patterns
 
 ### 2.1 Information Expert
-- **Verdict:** `violation`
-- **Evidence & Findings:** See **[V-01]**. In `ReturnService.calculateMonthlySales` (lines 196-209) and `calculateMonthlyReturns` (lines 220-232), `ReturnService` calculates financial totals directly from collections. The logic to compute monthly returns over a collection of `Return` domain objects is misplaced in the orchestration service rather than being encapsulated within a domain model or dedicated aggregation fabrication that owns the state/behavior.
-- **Cross-Reference:** Shared underlying defect with **High Cohesion** (**[V-01]**).
+- **Verdict:** `correct`
+- **Evidence & Findings:** `ReturnService` holds direct access to the return collection (`ReturnRepository`) and obtains sales data through `SaleService` orchestration. Calculating monthly totals using the records it accesses does not violate Information Expert, as `ReturnService` is the primary orchestrator with access to both data sources required for monthly balance aggregation (baseline `ReturnService.java`, lines 20-22).
 
 ### 2.2 Creator
 - **Verdict:** `correct`
@@ -33,7 +32,7 @@
 
 ### 2.5 High Cohesion
 - **Verdict:** `violation`
-- **Evidence & Findings:** See **[V-01]**. `ReturnService` mixes return transaction lifecycle management (`registerReturn`, lines 68-138) with sales aggregation and month-range validation (`calculateMonthlySales`, lines 196-209) and net balance computation (`generateMonthlyBalance`, lines 244-246).
+- **Evidence & Findings:** See **[V-01]**. `ReturnService` mixes two distinct operational responsibilities: managing return transaction workflows (`registerReturn`, lines 68-138) and handling cross-module sales reporting/aggregation (`calculateMonthlySales`, lines 196-209, and `generateMonthlyBalance`, lines 244-246). Combining transactional processing with cross-domain reporting calculation dilutes class cohesion.
 
 ### 2.6 Polymorphism
 - **Verdict:** `not applicable`
@@ -55,19 +54,19 @@
 
 ## 3. Detailed Audit Findings & Violations
 
-### [V-01] Misplaced Financial Aggregation & Multi-Responsibility in ReturnService
-- **GRASP Patterns Violated:** Information Expert, High Cohesion
+### [V-01] Unfocused Responsibility Boundary in ReturnService (Reporting vs Transactions)
+- **GRASP Pattern Violated:** High Cohesion
 - **Module / Component:** Return Management / `ReturnService`
-- **Exact Location:** `com.gamezone.service.ReturnService` (`registerReturn` L68-138, `calculateMonthlySales` L196-209, `calculateMonthlyReturns` L220-232, `generateMonthlyBalance` L244-246)
-- **Violation Reason:** `ReturnService` combines transaction processing for returns with sales aggregation, month-range validation, and net balance calculation (`generateMonthlyBalance` subtracts monthly returns from monthly sales). Calculating financial totals directly within the service violates Information Expert, as the calculation logic over collections belongs in domain objects/calculators. This weakens High Cohesion by mixing transactional workflows with reporting math.
-- **Consequence:** Modifying sales/returns aggregation or range validation rules forces changes to `ReturnService`, creating risks of regression in return transaction processing.
-- **Proposed Design Solution:** Extract sales/return aggregation logic into a dedicated Pure Fabrication or domain calculator (e.g., `MonthlyBalanceCalculator`). `ReturnService` will focus purely on orchestrating transactions and querying data.
+- **Exact Location:** `com.gamezone.service.ReturnService` (`registerReturn` L68-138 vs `calculateMonthlySales` L196-209, `calculateMonthlyReturns` L220-232, `generateMonthlyBalance` L244-246)
+- **Violation Reason:** While `ReturnService` is specified to handle monthly balance calculation (lines 20-22), bundling core return processing with cross-module sales querying/aggregation creates an unfocused responsibility boundary. Transactional lifecycle logic for returns and financial sales/balance reporting represent separate reasons to change.
+- **Consequence:** Changes to sales calculation business rules or financial reporting criteria force modifications to `ReturnService`, increasing the risk of introducing regressions into return transaction processing.
+- **Proposed Design Solution:** Extract sales aggregation and balance calculations into a dedicated reporting/calculation component (e.g., `ReturnReportingService` or `MonthlyBalanceCalculator`). `ReturnService` will maintain single focus on return creation and transaction validation.
 - **Correction Owner:** Developer 2 (Daniel)
 
 ---
 
 ### [V-02] Inconsistent Exception Handling for Corrupted CSV Storage Lines
-- **GRASP Patterns Violated:** Protected Variations
+- **GRASP Pattern Violated:** Protected Variations
 - **Module / Component:** Accessory Management / `AccessoryRepository` vs `ReturnRepository`
 - **Exact Location:** `com.gamezone.persistence.AccessoryRepository.fromCsvLine` (L140-176, specifically L149-164) vs `com.gamezone.persistence.ReturnRepository.fromCsvLine` (L134-163, specifically L141-146)
 - **Violation Reason:** `AccessoryRepository.fromCsvLine` uses `Integer.parseInt` without catching `NumberFormatException` or wrapping it in a domain exception. In contrast, `ReturnRepository.fromCsvLine` catches `DateTimeParseException` during date parsing and gracefully skips malformed records.
@@ -81,5 +80,5 @@
 
 | ID | Component | GRASP Pattern(s) | Severity | Description | Correction Owner |
 |---|---|---|---|---|---|
-| **V-01** | `ReturnService` | High Cohesion, Information Expert | Medium | Combines return lifecycle management with sales/returns aggregation and net balance computation. | Developer 2 (Daniel) |
-| **V-02** | `AccessoryRepository` | Protected Variations | Low | Unguarded `NumberFormatException` in CSV numeric parsing exposes callers to unhandled runtime crashes. | Developer 2 (Daniel) |
+| **V-01** | `ReturnService` | High Cohesion | Medium | Combines return lifecycle processing with cross-module sales reporting and monthly balance math. | Developer 2 (Daniel) |
+| **V-02** | `AccessoryRepository` | Protected Variations | Low | Unguarded `NumberFormatException` in CSV numeric parsing exposes callers to unhandled runtime crashes. | Developer 2 (Daniel) |rded `NumberFormatException` in CSV numeric parsing exposes callers to unhandled runtime crashes. | Developer 2 (Daniel) |
