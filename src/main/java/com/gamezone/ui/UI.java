@@ -48,9 +48,7 @@ public class UI {
         this.scanner = new Scanner(System.in);
         this.returnService = returnService;
     }
-    /**
-     * Starts the console user interface.
-     */
+
     /**
      * Starts the console user interface.
      */
